@@ -6,10 +6,12 @@ import discord
 def create_bot() -> discord.Bot:
     intents = discord.Intents.all()
     bot = discord.Bot(intents=intents)
-    return bot
+    
+    bot.load_extension("cogs.commands")
 
-    async def _load_cogs():
-        bot.load_extension("cogs.commands")
+    @bot.event
+    async def on_ready():
+        print(f"Iniciado como {bot.user}")
 
         # Ensure only in allowed guild
         allowed = 1487045117830369334
@@ -19,15 +21,8 @@ def create_bot() -> discord.Bot:
                 print(f"Bot is only allowed in {allowed}. Shutting down.")
                 await bot.close()
                 return
-
-        # Start keepalive server
-        try:
-            # start once
-            if not getattr(bot, "_keepalive_started", False):
-                bot._keepalive_started = True
-                bot.loop.create_task(start_keepalive())
-        except Exception:
-            pass
+        
+    return bot
 
 if __name__ == "__main__":
     token = os.getenv("DISCORD_TOKEN")
