@@ -30,7 +30,7 @@ def create_bot() -> discord.Bot:
             pass
 
 if __name__ == "__main__":
-    token = DISCORD_TOKEN
+    token = os.getenv("DISCORD_TOKEN")
     if not token:
         raise SystemExit("DISCORD_TOKEN environment variable is missing.")
     bot = create_bot()
