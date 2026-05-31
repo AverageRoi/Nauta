@@ -1,45 +1,24 @@
-const {
-    Client,
-    GatewayIntentBits,
-    Collection
-} = require('discord.js'); //cargar discord js
+// Código que inicial que dice la guía para el setup (un poco cambiado)
+// Require the necessary discord.js classes
+const { Client, Events, GatewayIntentBits } = require('discord.js');
 
-const fs = require('fs'); //librería fs (manejar archivos, usado en cargar carpetas o archvios json por ejemplo)
+// Se consigue el token por una environmental variable
+const BOT_TOKEN = process.env.BOT_TOKEN;
 
+// Create a new client instance (con todos los intents)
 const client = new Client({
-
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildMembers
-  ] //Intents de discord
-
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMembers,
+    ],
 });
-
-// Cargar comandos
-const commandFiles = fs
-  .readdirSync('./commands') 
-  .filter(file => file.endsWith('.js')); //Cargar los comandos a partir de sus archivos dle tipo: "nombreComando.js"
-
-for (const file of commandFiles) {
-
-  const command =
-    require(`./commands/${file}`); //Importar el archivo del comando
-
-  client.commands.set(
-    command.data.name,
-    command //importar el nombre del comando
-  );
-
-}
-
-// Evento ready
-client.once('clientReady', () => {
-
-  console.log(
-    `Conectado como ${client.user.tag}` //Pequeño aviso on_ready.
-  );
+// When the client is ready, run this code (only once).
+// The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
+// It makes some properties non-nullable.
+client.once(Events.ClientReady, (readyClient) => {
+	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
-
-//Falta poner lo de: client.login(process.env.TOKEN); ... Pero aún no sé cómo vamos a cargar el env :)
+// Log in to Discord with your client's token
+client.login(BOT_TOKEN);
