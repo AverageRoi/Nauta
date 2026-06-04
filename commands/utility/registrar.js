@@ -1,10 +1,10 @@
 const { SlashCommandBuilder } = require("discord.js");
-const prisma = require('../prisma/prisma')
+const prisma = require('../../prisma/prisma.js')
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("registrar")
-        .setDescription("Introduce las coordenadas para registrar'")
+        .setDescription("Introduce las coordenadas para registrar")
         .setDMPermission(false) //hago que sólo se pueda usar en servidores
         .addStringOption((option) => 
             option
