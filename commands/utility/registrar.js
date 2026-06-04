@@ -34,6 +34,40 @@ module.exports = {
         const coordinates = interaction.options.getString("coordenadas");
         const dimension = interaction.options.getString("dimension");
 
+
+        // Declaro las variables, me acabo de enterar de que las variables declaradas dentro de ifs no persisten,
+        // pero los valores asignados dentro de ifs si.
+
+        let x_coordinates;
+        let y_coordinates;
+        let z_coordinates
+
+        // True if the coordinate has weird values we don't accept
+        const Has_not_numeric_characters = /[^0-9,]/.coordinatest(str);
+
+        // Para ver si no han introducido los datos necesarios
+        if (!coordinates_untrimmed[0] || !coordinates_untrimmed[1])  {
+            await interaction.reply( {content: "Please enter at least X and Z coordinates", flags: MessageFlags.Ephemeral });
+            return
+        }
+        else if (Has_not_numeric_characters) {
+            await interaction.reply( {content: "Please enter numeric values separated by commas", flags: MessageFlags.Ephemeral });
+            return
+        }
+        // Para ver si sólo hay x e y
+        else if (!coordinates_untrimmed[2]) {
+            x_coordinates = coordinates_untrimmed[0].trim()
+            // Sólo por si acaso
+            y_coordinates = null
+            z_coordinates = coordinates_untrimmed[1].trim()
+        }
+        else {
+            x_coordinates = coordinates_untrimmed[0].trim()
+            y_coordinates = coordinates_untrimmed[1].trim()
+            z_coordinates = coordinates_untrimmed[2].trim()
+        }
+
+
         // Aquí iría la conexión con el prisma.js y todas esas cosiñas ~ Se aprecia el galego ahí :3
         try{
             await prisma.guildConfig.upsert({ //upsert -> si hay valor, sustituye; si no hay, crea
