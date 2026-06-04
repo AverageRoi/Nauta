@@ -13,17 +13,17 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.8.0",
-    "@prisma/client": "^7.8.0",
+    "@prisma/adapter-pg": "^6.19.2",
+    "@prisma/client": "^6.19.2",
     "discord.js": "^14.26.4",
     "dotenv": "^17.4.2",
     "pg": "^8.21.0"
   },
   "devDependencies": {
     "@types/pg": "^8.20.0",
-    "prisma": "^7.8.0",
+    "prisma": "^6.19.2",
     "tsx": "^4.22.4",
     "discord.js": "^14.26.4",
-    "@prisma/client": "^6.x.x"
+    "@prisma/client": "^6.19.2"
   }
 }
