@@ -5,6 +5,7 @@ const { Client, Collection, Events, GatewayIntentBits, MessageFlags } = require(
 
 // Se consigue el token por una environmental variable
 const BOT_TOKEN = process.env.BOT_TOKEN;
+const DATABASE_URL = process.env.DATABASE_URL; //Same con la url de la bdd
 
 // Command handler (para no tener que hacer una larga cadena de if elifs si hay muchos comandos)
 const fs = require("node:fs");
