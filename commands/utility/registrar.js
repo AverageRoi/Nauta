@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const prisma = require('../../prisma/prisma.js')
+let prisma;
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -27,6 +27,10 @@ module.exports = {
             ),
 
     async execute(interaction) {
+            if (!prisma) {
+                prisma = require('../../prisma/prisma.js');
+            }
+        
         const coordinates = interaction.options.getString("coordenadas");
         const dimension = interaction.options.getString("dimension");
 
