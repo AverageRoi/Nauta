@@ -2,8 +2,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 let prisma;
 
-console.log("EXECUTE registrar:", Date.now());
-
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("registrar")
@@ -86,8 +84,8 @@ module.exports = {
             await prisma.cords.create({ //he cambiado upsert a create porque no es necesario actualizar
                 data: {
                     guildId: interaction.guildId,
-                    interaction_user: interaction.user.id,
-                    alias: interaction.options.getString("alias"),
+                    interaction_user,
+                    alias,
                     x_coordinates,
                     y_coordinates,
                     z_coordinates,
