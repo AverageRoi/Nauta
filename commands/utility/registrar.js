@@ -76,12 +76,16 @@ module.exports = {
                     guildId: interaction.guildId //cargamos el servidor para poder expandir en un futuro
                 },
                 update: {
-                    coordinates, //guardamos dos valores: coordinates y dimension
+                    x_coordinates,
+                    y_coordinates,
+                    z_coordinates, //guardamos dos valores: coordinates y dimension
                     dimension,
                 },
                 create: {
                     guildId: interaction.guildId, // o los creamos, por eso del upsert
-                    coordinates,
+                    x_coordinates,
+                    y_coordinates,
+                    z_coordinates,
                     dimension,
                 }
             });

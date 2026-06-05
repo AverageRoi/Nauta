@@ -12,8 +12,10 @@ datasource db {
   url = env("DATABASE_URL")
 }
 
-model Cords {
+model cords {
     guildId String @id
-    cords String 
+    x_coordinates String 
+    y_coordinates String 
+    z_coordinates String 
     dimension String 
 }
