@@ -16,7 +16,7 @@ model cords {
     id Int @id @default(autoincrement())
     guildId String
     x_coordinates String 
-    y_coordinates String 
+    y_coordinates String?
     z_coordinates String 
     dimension String 
 }

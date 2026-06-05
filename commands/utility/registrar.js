@@ -71,18 +71,9 @@ module.exports = {
  
         // Aquí iría la conexión con el prisma.js y todas esas cosiñas ~ Se aprecia el galego ahí :3
         try{
-            await prisma.cords.upsert({ //upsert -> si hay valor, sustituye; si no hay, crea
-                where: {
-                    guildId: interaction.guildId //cargamos el servidor para poder expandir en un futuro
-                },
-                update: {
-                    x_coordinates,
-                    y_coordinates,
-                    z_coordinates, //guardamos dos valores: coordinates y dimension
-                    dimension,
-                },
-                create: {
-                    guildId: interaction.guildId, // o los creamos, por eso del upsert
+            await prisma.cords.create({ //he cambiado upsert a create porque no es necesario actualizar
+                data: {
+                    guildId: interaction.guildId,
                     x_coordinates,
                     y_coordinates,
                     z_coordinates,
