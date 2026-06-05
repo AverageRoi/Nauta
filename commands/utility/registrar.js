@@ -48,7 +48,7 @@ module.exports = {
 
         // Para ver si no han introducido los datos necesarios
         if (!coordinates_untrimmed[0] || !coordinates_untrimmed[1])  {
-            await interaction.reply( {content: "Please enter at least X and Z coordinates", ephemeral: true }); //cambio el MessageFlags: ephemeral por ephemeral:true, que es más "moderno"
+            await interaction.reply( {content: "Please enter at least X and Z coordinates", ephemeral: true });
             return
         }
         else if (Has_not_numeric_characters) {
