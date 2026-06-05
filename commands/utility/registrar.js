@@ -79,7 +79,8 @@ module.exports = {
             z_coordinates = coordinates_untrimmed[2].trim()
         }
 
- 
+        console.log(interaction.options.data);
+        
         // Aquí iría la conexión con el prisma.js y todas esas cosiñas ~ Se aprecia el galego ahí :3
         try{
             await prisma.cords.create({ //he cambiado upsert a create porque no es necesario actualizar
