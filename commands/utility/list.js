@@ -8,7 +8,7 @@ const DIMENSIONS = {
         databaseValue: "overworld_dimension",
         label: "Overworld",
         color: 0x3986ed,
-        buttonStyle: ButtonStyle.Primary,
+        buttonStyle: ButtonStyle.Success,
 
         description: "**The list of Overworld coordinates**",
 
@@ -24,7 +24,7 @@ const DIMENSIONS = {
 
         description: "**The list of Nether coordinates**",
 
-        thumbnail: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpapercave.com%2Fwp%2Fwp6065690.png&f=1&nofb=1&ipt=167743413210703d0b258538ead205971d1a560998c1135c5e0a3322c162cb82"
+        thumbnail: "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fminecraft.fr%2Fwp-content%2Fuploads%2F2025%2F04%2Fgrottes-du-nether-lave-et-lumiere-mellow-shader-minecraft-1200x675.jpg&f=1&nofb=1&ipt=f8c3bee58f6f84f48d83106aad42a23caa1ae887d789f0b01590aa4058278ef7"
     },
 
     end: {
