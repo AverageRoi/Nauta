@@ -5,7 +5,7 @@ const prisma = require("../../prisma/prisma.js");
 const DIMENSIONS = {
 
     overworld: {
-        databaseValue: "Overworld",
+        databaseValue: "overworld_dimension",
         label: "Overworld",
         color: 0x3986ed,
         buttonStyle: ButtonStyle.Primary,
@@ -17,7 +17,7 @@ const DIMENSIONS = {
 
     nether: {
 
-        databaseValue: "Nether",
+        databaseValue: "nether_dimension",
         label: "Nether",
         color: 0x910500,
         buttonStyle: ButtonStyle.Danger,
@@ -28,7 +28,7 @@ const DIMENSIONS = {
     },
 
     end: {
-        databaseValue: "End",
+        databaseValue: "end_dimension",
         label: "End",
         color: 0xa500da,
         buttonStyle: ButtonStyle.Secondary,
@@ -60,34 +60,29 @@ function truncateText(value, maximumLength) {
     return `${text.slice(0, maximumLength - 1)}…`;
 }
 
-function buildCoordinatesField(coordinate, index) {
-    // If alias is null, undefined, or empty, we use a fallback
-    const alias = coordinate.alias?.trim() || `Coordinate ${index + 1}`;
+    function buildCoordinateField(coordinate, index) {
+    // If alias in null, undefined, or weird stuff happens, we change it to the next one
+        const alias =
+        coordinate.alias?.trim() ||
+        `Coordinate ${index + 1}`;
 
-    const x = String(coordinate.x ?? "?");
-    const y = String(coordinate.y ?? "?");
-    const z = String(coordinate.z ?? "?");
+    // If x or z coordinates are missing, we indicate it (should NOT happen normally)
+    const x = String(coordinate.x_coordinates ?? "?");
+    const z = String(coordinate.z_coordinates ?? "?");
 
-    // Build the field value gradually (Idk how this syntax works, don't ask)
-    let fieldValue =
-        `**X:** \`${x}\`\n` +
-        `**Y:** \`${y}\`\n` +
-        `**Z:** \`${z}\``;
+    let fieldValue = `**X:** \`${x}\`\n`;
 
-    // Includes notes, if no notes, we boycott the Notes Worker Association
-    if (coordinate.notes?.trim()) {
-        fieldValue += `\n**Notes:** ${coordinate.notes.trim()}`;
+    if (coordinate.y_coordinates !== null) {
+        const y = String(coordinate.y_coordinates);
+        fieldValue += `**Y:** \`${y}\`\n`;
     }
 
+    fieldValue += `**Z:** \`${z}\``;
 
-        return {
-        // Discord embed field names have a maximum length.
+    // We also make it be within Discord embed limits
+    return {
         name: truncateText(alias, 256),
-
-        // Discord embed field values also have a maximum length.
         value: truncateText(fieldValue, 1024),
-
-        // false means each coordinate normally occupies its own row, but we don't want to cluster with a long list
         inline: true,
     };
 }
@@ -219,7 +214,7 @@ module.exports = {
 
         try {
             // This is what Gpt says, I think it's called coordinates
-            const coordinates = await prisma.coordinate.findMany({
+            const coordinates = await prisma.cords.findMany({
                 where: {
                     guildId: interaction.guildId,
                 },
@@ -230,7 +225,7 @@ module.exports = {
                 },
             });
 
-            let selectedDimension = DEFAULT_DIMENSION;
+            let selectedDimension = default_dimension;
 
             
             // Build the initial Overworld interface.
@@ -258,7 +253,7 @@ module.exports = {
             const collector =
                 responseMessage.createMessageComponentCollector({
                     componentType: ComponentType.Button,
-                    time: COLLECTOR_TIME,
+                    time: collector_time,
                 });
 
             // Runs every time one of the buttons is clicked.
