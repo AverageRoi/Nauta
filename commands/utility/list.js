@@ -7,7 +7,7 @@ const DIMENSIONS = {
     overworld: {
         databaseValue: "overworld_dimension",
         label: "Overworld",
-        color: 0x3986ed,
+        color: 0x36eb51,
         buttonStyle: ButtonStyle.Success,
 
         description: "**The list of Overworld coordinates**",
