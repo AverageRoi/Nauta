@@ -25,12 +25,21 @@ module.exports = {
                     { name: "End", value: "end_dimension" },
                     { name: "Overworld/Nether", value: "all_dimension"},
                 )
-            ),
+            )
+        .addNumberOption((option) =>
+            option
+                .setName("distancia")
+                .setDescription("Buscar coordenadas a menos de ___ bloques de distancia (500 por defecto).")
+                .setRequired(false)
+                .setMinValue(1)
+                .setMaxValue(10000)
+        ),
     
     async execute(interaction){
         const coordinates = interaction.options.getString("coordenadas");
         const dimension = interaction.options.getString("dimension");
         const interaction_user = interaction.user.id;  //Lo mismo, copia-pega en algunas partes
+        const maxdist = interaction.options.getNumber("distnacia") ?? 500;
 
         // Declaro las variables, me acabo de enterar de que las variables declaradas dentro de ifs no persisten,
         // pero los valores asignados dentro de ifs si.
@@ -89,21 +98,27 @@ module.exports = {
             return coordinate.dimension === dimension;
         });
 
-        console.log(filteredCoordinates);
-        //Filtrar por cercanía de 500 bloques, se puede ampliar reducir cambiadno el número señalado
+        console.log("Filtered:" + filteredCoordinates);
+
         const nearCords = filteredCoordinates.filter((coordinate) => {
             const db_x = parseFloat(coordinate.x_coordinates);
             const db_z = parseFloat(coordinate.z_coordinates);
-            
-            const dist = Math.sqrt(
-                (x_coordinates - db_x) ** 2 + (z_coordinates - db_z) ** 2
-            );
-
-            return dist <= 500; //Este número
+            let dist
+    
+            if (coordinate.dimension = "nether_dimension"){
+                const dist = Math.sqrt(
+                    (x_coordinates - (db_x * 8)) ** 2 + (z_coordinates - (db_z * 8)) ** 2
+                );
+            } else {
+                const dist = Math.sqrt((x_coordinates - db_x) ** 2 + (z_coordinates - db_z) ** 2);
+            };
+            // Lo que hago es sacar de los valores con dimensión nether, multiplico la coordenada de la base de datos por ocho, para que esté en formato overworld. No tengo claro si tiene sentido.
+            return dist <= maxdist;
         });
         
-        console.log(nearCords) //Sí, falta que discord haga algo con esta info, pero tengo que comer jshdjsjh 
+        console.log('Final:' + nearCords) //Sí, falta que discord haga algo con esta info, pero tengo que comer jshdjsjh 
 
+        await interaction.reply({content: nearCords});
     }
 }
 
