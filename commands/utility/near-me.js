@@ -1,5 +1,5 @@
 const { SlashCommandBuilder} = require("discord.js")
-const{ prisma } = require("../../cords_bot/prisma/prisma.js")
+const{ prisma } = require("../../prisma/prisma.js")
 
 module.exports = {
     data: new SlashCommandBuilder()
