@@ -1,8 +1,8 @@
 const { SlashCommandBuilder} = require("discord.js")
-const{ prisma } = require("../../prisma/prisma.js")
+const prisma = require("../../prisma/prisma.js") //Bah ya sabes esto no lo comento jsjsj
 
 module.exports = {
-    data: new SlashCommandBuilder()
+    data: new SlashCommandBuilder() //Todo el slash command está hecho rápido para que funcione, igual no está bien en plan front
         .setName("near-me")
         .setDescription(" Busca cosas cerca de ti")
         .setDMPermission(false) //hago que sólo se pueda usar en servidores
@@ -12,7 +12,7 @@ module.exports = {
                 .setDescription("X, Y, Z or X, Z")
                 .setRequired(true)
                 .setMaxLength(26), // Lo que he contado como las coordenadas más alejadas del World Border en caracteres
-            )
+            ) //Ehhh sí, los comentarios por aquí son tuyos porque hay un poco de copia-pega
             // Creo que Str es lo mejor aunque sea un int, ya que es fácil liarnos y podemos dividirlo y hacer typecasting después
         .addStringOption((option) => 
             option
@@ -30,7 +30,7 @@ module.exports = {
     async execute(interaction){
         const coordinates = interaction.options.getString("coordenadas");
         const dimension = interaction.options.getString("dimension");
-        const interaction_user = interaction.user.id;
+        const interaction_user = interaction.user.id;  //Lo mismo, copia-pega en algunas partes
 
         // Declaro las variables, me acabo de enterar de que las variables declaradas dentro de ifs no persisten,
         // pero los valores asignados dentro de ifs si.
@@ -39,7 +39,7 @@ module.exports = {
         let y_coordinates;
         let z_coordinates;
 
-        // True if the coordinate has weird values we don't accept
+        // True if the coordinate has weird values we don't accept 
         const Has_not_numeric_characters = /[^0-9,\-\s]/.test(coordinates);
         const coordinates_untrimmed = coordinates.split(",")
 
@@ -69,6 +69,7 @@ module.exports = {
         y_coordinates = parseFloat(y_coordinates);
         z_coordinates = parseFloat(z_coordinates);
 
+        //IMportar base de datos del servidor
         const dbcords = await prisma.cords.findMany({
             where: {
                 guildId: interaction.guildId,
@@ -80,6 +81,7 @@ module.exports = {
             },
         });
 
+        //filtrar pro dimensión
         const filteredCoordinates = dbcords.filter((coordinate) => {
             if (dimension === "all_dimension") {
                 return coordinate.dimension === "overworld_dimension" || coordinate.dimension === "nether_dimension";
@@ -88,7 +90,7 @@ module.exports = {
         });
 
         console.log(filteredCoordinates);
-
+        //Filtrar por cercanía de 500 bloques, se puede ampliar reducir cambiadno el número señalado
         const nearCords = filteredCoordinates.filter((coordinate) => {
             const db_x = parseFloat(coordinate.x_coordinates);
             const db_z = parseFloat(coordinate.z_coordinates);
@@ -97,10 +99,12 @@ module.exports = {
                 (x_coordinates - db_x) ** 2 + (z_coordinates - db_z) ** 2
             );
 
-            return dist <= 500;
+            return dist <= 500; //Este número
         });
         
-        console.log(nearCords)
+        console.log(nearCords) //Sí, falta que discord haga algo con esta info, pero tengo que comer jshdjsjh 
 
     }
 }
+
+//Cómo se me puede dar tan mal comentar código? Lo siento. :sad:
