@@ -65,9 +65,9 @@ module.exports = {
             z_coordinates = coordinates_untrimmed[2].trim()
         }
 
-        parseFloat(x_coordinates);
-        parseFloat(x_coordinates);
-        parseFloat(x_coordinates);
+        x_coordinates = parseFloat(x_coordinates);
+        y_coordinates = parseFloat(x_coordinates);
+        z_coordinates = parseFloat(x_coordinates);
 
         const dbcords = await prisma.cords.findMany({
             where: {
