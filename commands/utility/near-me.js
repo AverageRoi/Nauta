@@ -92,7 +92,7 @@ module.exports = {
             const db_z = parseFloat(coordinate.z_coordinates);
             
             const dist = Math.sqrt(
-                (x_coordinates - db_x) ** 2 + (z_coordiantes - db_z) ** 2
+                (x_coordinates - db_x) ** 2 + (z_coordinates - db_z) ** 2
             );
 
             return dist <= 500;
