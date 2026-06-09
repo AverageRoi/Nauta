@@ -66,8 +66,8 @@ module.exports = {
         }
 
         x_coordinates = parseFloat(x_coordinates);
-        y_coordinates = parseFloat(x_coordinates);
-        z_coordinates = parseFloat(x_coordinates);
+        y_coordinates = parseFloat(y_coordinates);
+        z_coordinates = parseFloat(z_coordinates);
 
         const dbcords = await prisma.cords.findMany({
             where: {
@@ -80,10 +80,12 @@ module.exports = {
             },
         });
 
-        const filteredCoordinates = dbcords.filter(
-        (coordinate) =>
-            coordinate.dimension === dimension.databaseValue
-        );
+        const filteredCoordinates = dbcords.filter((coordinate) => {
+            if (dimension === "all_dimension") {
+                return coordinate.dimension === "overworld_dimension" || coordinate.dimension === "nether_dimension";
+            }
+            return coordinate.dimension === dimension;
+        });
 
         console.log(filteredCoordinates);
 
