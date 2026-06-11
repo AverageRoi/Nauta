@@ -111,9 +111,13 @@ module.exports = {
             return dist <= maxdist;
         });
         
-        console.log('Final:', nearCords) //Sí, falta que discord haga algo con esta info, pero tengo que comer jshdjsjh 
+        console.log('Final:', nearCords); //Sí, falta que discord haga algo con esta info, pero tengo que comer jshdjsjh 
 
-        await interaction.reply({content: nearCords});
+        const estavariablesellamafoca = String(nearCords.y_coordinates) ?? "?" //protección para la y cuando no está y esas cosiñas
+
+        const finalEmbed = `${nearCords.alias}: ${nearCords.x_coordinates}, ${estavariablesellamafoca}, ${nearCords.z_coordinates}`
+    
+        await interaction.reply({content: 'AQUÍ ESTÁN TUS COORDENADAS, MUCHACHO', embeds: finalEmbed})
     }
 }
 
