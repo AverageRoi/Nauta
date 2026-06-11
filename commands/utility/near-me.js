@@ -117,7 +117,7 @@ module.exports = {
 
         const finalEmbed = `${nearCords.alias}: ${nearCords.x_coordinates}, ${estavariablesellamafoca}, ${nearCords.z_coordinates}`
     
-        await interaction.reply({content: 'AQUÍ ESTÁN TUS COORDENADAS, MUCHACHO', embeds: finalEmbed})
+        await interaction.reply({content: finalEmbed})
     }
 }
 
