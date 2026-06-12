@@ -101,8 +101,12 @@ module.exports = {
 
         //filtrar por dimensión
         const filteredCoordinates = dbcords.filter((coordinate) => {
-            return [coordinate.dimension === dimension, coordinate.dimension === target];
+            return coordinate.dimension === dimension;
         });
+
+        const filteredTargetCoordinates = dbcords.filter((coordinate) => {
+            return coordinate.dimension === target;
+        })
 
         console.log("Filtered:", filteredCoordinates);
 
@@ -110,22 +114,44 @@ module.exports = {
             const db_x = parseFloat(coordinate.x_coordinates);
             const db_z = parseFloat(coordinate.z_coordinates);
 
-
             const dist = Math.sqrt((x_coordinates - db_x) ** 2 + (z_coordinates - db_z) ** 2);
 
             // Lo que hago es sacar de los valores con dimensión nether, multiplico la coordenada de la base de datos por ocho, para que esté en formato overworld. No tengo claro si tiene sentido.
             return dist <= maxdist;
         });
         
+        const nearTargetCords = filteredTargetCoordinates.filter((coordinate) => {
+            const tardb_x = parseFloat(coordinate.x_coordinates);
+            const tardb_z = paseFloat(coordinate.z_coordinates);
+
+            if (target === "nether_dimension") {
+              const targetdist = Math.sqrt((x_coordinates - (tardb_x * 8)) ** 2 + (z_coordinates - (tardb_z * 8)) ** 2);
+            }
+            else if (target === "overworld_dimension") {
+              const targetdist = Math.sqrt((x_coordinates - (tardb_x / 8)) ** 2 + (z_coordinates - (tardb_z / 8)) ** 2);
+            }
+
+            return targetdist <= maxdist;
+        })
+
         console.log('Final:', nearCords); //Sí, falta que discord haga algo con esta info, pero tengo que comer jshdjsjh 
 
-        const finalEmbed = nearCords
-            .map(coord => {
-                const y = coord.y_coordinates ?? "?";
+        const finalEmbed = `${dimension}: \n
+            ${nearCords
+                .map(coord => {
+                    const y = coord.y_coordinates ?? "?";
 
-                return `${coord.alias}: ${coord.x_coordinates}, ${y}, ${coord.z_coordinates}`;
-            })
-            .join("\n");
+                    return `${coord.alias}: ${coord.x_coordinates}, ${y}, ${coord.z_coordinates}`;
+                })
+                .join("\n")}
+            ${target}: \n,
+            ${nearTargetCords
+                .map(coord => {
+                    const y = coord.y_coordinates ?? "?";
+
+                    return `${coord.alias}: ${coord.x_coordinates}, ${y}, ${coord.z_coordinates}`;
+                })
+                .join("\n")}`
 
             await interaction.reply({ content: finalEmbed });
     }
