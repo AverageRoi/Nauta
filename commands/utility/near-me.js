@@ -136,6 +136,10 @@ module.exports = {
 
         console.log('Final:', nearCords); //Sí, falta que discord haga algo con esta info, pero tengo que comer jshdjsjh 
 
+        console.log("target:", target);
+        console.log("filteredTargetCoordinates:", filteredTargetCoordinates.length);
+        console.log("nearTargetCords:", nearTargetCords.length);
+
         const finalEmbed = `${dimension}: \n
             ${nearCords
                 .map(coord => {
