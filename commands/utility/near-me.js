@@ -1,4 +1,4 @@
-const { SlashCommandBuilder} = require("discord.js")
+const { SlashCommandBuilder, EmbedBuilder} = require("discord.js")
 const prisma = require("../../prisma/prisma.js") //Bah ya sabes esto no lo comento jsjsj
 
 module.exports = {
@@ -137,7 +137,7 @@ module.exports = {
                 targetdist,
                 "(max:", maxdist, ")"
             );
-            
+
             return targetdist <= maxdist;
         });
 
@@ -147,24 +147,68 @@ module.exports = {
         console.log("filteredTargetCoordinates:", filteredTargetCoordinates.length);
         console.log("nearTargetCords:", nearTargetCords.length);
 
-        const finalEmbed = `${dimension}: \n
-            ${nearCords
-                .map(coord => {
-                    const y = coord.y_coordinates ?? "?";
+        const dimensionNames = {
+            overworld_dimension: "🌍 Overworld",
+            nether_dimension: "🔥 Nether",
+            end_dimension: "🌌 End",
+        };
 
-                    return `${coord.alias}: ${coord.x_coordinates}, ${y}, ${coord.z_coordinates}`;
-                })
-                .join("\n")}
-            ${target}: \n
-            ${nearTargetCords
-                .map(coord => {
-                    const y = coord.y_coordinates ?? "?";
+        const getDimName = (dim) => dimensionNames[dim] ?? dim;
 
-                    return `${coord.alias}: ${coord.x_coordinates}, ${y}, ${coord.z_coordinates}`;
-                })
-                .join("\n")}`
+        const embed = new EmbedBuilder()
+            .setColor(0x36eb51)
+            .setTitle("📍 Nearby Coordinates")
+            .setDescription(
+                `Showing coordinates within **${maxdist} blocks** of your location.`
+            )
+            .setTimestamp();
 
-            await interaction.reply({ content: finalEmbed });
+        if (nearCords.length > 0) {
+            embed.addFields({
+                name: getDimName(dimension),
+                value: nearCords
+                    .map(coord => {
+                        const y = coord.y_coordinates ?? "?";
+
+                        return (
+                            `**${coord.alias}**\n` +
+                            `\`${coord.x_coordinates}, ${y}, ${coord.z_coordinates}\``
+                        );
+                    })
+                    .join("\n\n"),
+                inline: false,
+            });
+        }
+
+        if (target && nearTargetCords.length > 0) {
+            embed.addFields({
+                name: dimensionNames[target],
+                value: nearTargetCords
+                    .map(coord => {
+                        const y = coord.y_coordinates ?? "?";
+
+                        return (
+                            `**${coord.alias}**\n` +
+                            `\`${coord.x_coordinates}, ${y}, ${coord.z_coordinates}\``
+                        );
+                    })
+                    .join("\n\n"),
+                inline: false,
+            });
+        }
+
+        if (
+            nearCords.length === 0 &&
+            (!target || nearTargetCords.length === 0)
+        ) {
+            embed.setDescription(
+                `No coordinates were found within **${maxdist} blocks**.`
+            );
+        }
+
+        await interaction.reply({
+            embeds: [embed],
+        });
     }
 }
 
