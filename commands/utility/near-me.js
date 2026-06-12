@@ -126,10 +126,10 @@ module.exports = {
             let targetdist
 
             if (target === "nether_dimension") {
-              const targetdist = Math.sqrt((x_coordinates - (tardb_x * 8)) ** 2 + (z_coordinates - (tardb_z * 8)) ** 2);
+                targetdist = Math.sqrt((x_coordinates - (tardb_x * 8)) ** 2 + (z_coordinates - (tardb_z * 8)) ** 2);
             }
             else if (target === "overworld_dimension") {
-              const targetdist = Math.sqrt((x_coordinates - (tardb_x / 8)) ** 2 + (z_coordinates - (tardb_z / 8)) ** 2);
+                targetdist = Math.sqrt((x_coordinates - (tardb_x / 8)) ** 2 + (z_coordinates - (tardb_z / 8)) ** 2);
             }
 
             return targetdist <= maxdist;
