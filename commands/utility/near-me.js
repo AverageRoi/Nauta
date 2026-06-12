@@ -121,19 +121,18 @@ module.exports = {
         });
         
         const nearTargetCords = filteredTargetCoordinates.filter((coordinate) => {
-            const tardb_x = parseFloat(coordinate.x_coordinates);
-            const tardb_z = parseFloat(coordinate.z_coordinates);
-            let targetdist
+            const x = parseFloat(coordinate.x_coordinates);
+            const z = parseFloat(coordinate.z_coordinates);
 
-            if (target === "nether_dimension") {
-                targetdist = Math.sqrt((x_coordinates - (tardb_x * 8)) ** 2 + (z_coordinates - (tardb_z * 8)) ** 2);
-            }
-            else if (target === "overworld_dimension") {
-                targetdist = Math.sqrt((x_coordinates - (tardb_x / 8)) ** 2 + (z_coordinates - (tardb_z / 8)) ** 2);
-            }
+            const factor = target === "nether_dimension" ? 8 : 1 / 8;
+
+            const targetdist = Math.sqrt(
+                (x_coordinates - x * factor) ** 2 +
+                (z_coordinates - z * factor) ** 2
+            );
 
             return targetdist <= maxdist;
-        })
+        });
 
         console.log('Final:', nearCords); //Sí, falta que discord haga algo con esta info, pero tengo que comer jshdjsjh 
 
@@ -145,7 +144,7 @@ module.exports = {
                     return `${coord.alias}: ${coord.x_coordinates}, ${y}, ${coord.z_coordinates}`;
                 })
                 .join("\n")}
-            ${target}: \n,
+            ${target}: \n
             ${nearTargetCords
                 .map(coord => {
                     const y = coord.y_coordinates ?? "?";
