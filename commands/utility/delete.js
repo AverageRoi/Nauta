@@ -15,22 +15,15 @@ module.exports = {
 
     async execute(interaction) {
         const aliasborrar = interaction.options.getString("alias");
-        const cords = await prisma.cords.findMany({
-            where: {
-                guildId: interaction.guildId,
-            },
-            orderBy: {
-                alias: "asc",
-            },
-        });
+
         await interaction.reply(
             `Deleting coordinates from ${alias}...`,
         );
         try {
             const result = await prisma.cords.deleteMany({
                 where: {
-                    guildId = interaction.guildId,
-                    alias = aliasborrar,
+                    guildId: interaction.guildId,
+                    alias: aliasborrar,
                 }})
             if (result.count === 0){
                 await interaction.editReply(
