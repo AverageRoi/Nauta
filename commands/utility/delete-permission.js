@@ -9,7 +9,7 @@ module.exports = {
                 .setName("rol")
                 .setDescription("Rol able to delete coordinates.")
                 .setRequired(true)
-                .setChoices(
+                .addChoices(
                     { name: "Administor roles", value: "admin" },
                     { name: 'Custom "Nauta admin" role. ', value: "custom" },
                     { name: "Everyone", value: "everyone" }
@@ -17,7 +17,7 @@ module.exports = {
             )
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
     async execute(interaction) {
-        if (interaction.getStringOption("rol") === "custom"){
+        if (interaction.options.getString("rol") === "custom"){
             const customrole = await interaction.guild.roles.create({
                 name: 'Nauta Admin',
                 color: 0x7950c0,
