@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -14,8 +14,8 @@ module.exports = {
                     { name: 'Custom "Nauta admin" role. ', value: "custom" },
                     { name: "Everyone", value: "everyone" }
                 )
-                .setDefaultMemberPermissions("0x0000000000000008")
-            ),
+            )
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
     async execute(interaction) {
         if (interaction.getStringOption("rol") === "custom"){
             const customrole = await interaction.guild.roles.create({
