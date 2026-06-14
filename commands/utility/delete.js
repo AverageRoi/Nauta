@@ -17,7 +17,7 @@ module.exports = {
         const aliasborrar = interaction.options.getString("alias");
 
         await interaction.reply(
-            `Deleting coordinates from ${alias}...`,
+            `Deleting coordinates from ${aliasborrar}...`,
         );
         try {
             const result = await prisma.cords.deleteMany({
@@ -28,18 +28,18 @@ module.exports = {
             if (result.count === 0){
                 await interaction.editReply(
                     `No coordinates under "${aliasborrar}".`
-                )
+                );
+                return;
             }
+            await interaction.editReply(
+                `"${aliasborrar}" deleted.`
+            );
         }
         catch (error) {
             console.error('Error: ', error)
             await interaction.editReply(
                 `Unable to delete coordinates.`,
             );
-        } finally {
-            await interaction.editReply(
-                `"${alias}" deleted.`,
-            );
-    }
+        }
     },
 };

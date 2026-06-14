@@ -4,14 +4,6 @@ let prisma;
 
 //Esto es solo para comprobar si existe alias. Se importa por otro lado la bdd.
 const bdd = require("../../prisma/prisma.js");
-const listacoords = await bdd.cords.findMany({
-    where: {
-        guildId: interaction.guildId,
-    },
-    orderBy: {
-        alias: "asc",
-    }
-});
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -54,6 +46,15 @@ module.exports = {
         const dimension = interaction.options.getString("dimension");
         const alias = interaction.options.getString("alias");
         const interaction_user = interaction.user.id;
+
+        const listacoords = await bdd.cords.findMany({ //Esto es solo para comprobar si existe alias. Se importa por otro lado la bdd.
+            where: {
+                guildId: interaction.guildId,
+            },
+            orderBy: {
+                alias: "asc",
+            }
+        });
 
         // Declaro las variables, me acabo de enterar de que las variables declaradas dentro de ifs no persisten,
         // pero los valores asignados dentro de ifs si.
