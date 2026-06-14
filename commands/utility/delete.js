@@ -1,13 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
 const prisma = require("../../prisma/prisma.js");
-const cords = await bdd.cords.findMany({
-    where: {
-        guildId: interaction.guildId,
-    },
-    orderBy: {
-        alias: "asc",
-    },
-});
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -22,7 +14,15 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        const aliasborrar = interaction.options.getString("alias")
+        const aliasborrar = interaction.options.getString("alias");
+        const cords = await prisma.cords.findMany({
+            where: {
+                guildId: interaction.guildId,
+            },
+            orderBy: {
+                alias: "asc",
+            },
+        });
         await interaction.reply(
             `Deleting coordinates from ${alias}...`,
         );
