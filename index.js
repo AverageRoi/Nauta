@@ -16,10 +16,7 @@ const path = require("node:path");
 // Create a new client instance (con todos los intents)
 const client = new Client({
     intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.Guilds
     ],
 });
 // When the client is ready, run this code (only once).
