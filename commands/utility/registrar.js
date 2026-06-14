@@ -2,6 +2,17 @@
 const { SlashCommandBuilder } = require("discord.js");
 let prisma;
 
+//Esto es solo para comprobar si existe alias. Se importa por otro lado la bdd.
+const bdd = require("../../prisma/prisma.js");
+const listacoords = await bdd.cords.findMany({
+    where: {
+        guildId: interaction.guildId,
+    },
+    orderBy: {
+        alias: "asc",
+    }
+});
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("registrar")
@@ -31,7 +42,7 @@ module.exports = {
                 .setName("alias")
                 .setDescription("Alias to be associated to those coordinates (e.g. end portal)")
                 .setRequired(true)
-                .setMaxLength(1000)
+                .setMaxLength(100)
         ),
 
     async execute(interaction) {
@@ -56,7 +67,10 @@ module.exports = {
         const coordinates_untrimmed = coordinates.split(",")
 
         // Para ver si no han introducido los datos necesarios
-        if (!coordinates_untrimmed[0] || !coordinates_untrimmed[1])  {
+        if (listacoords.alias.includes(alias)){
+            await interaction.reply( {content: "That alias is already in use.", ephemeral: true });
+            return
+        } else if (!coordinates_untrimmed[0] || !coordinates_untrimmed[1])  {
             await interaction.reply( {content: "Please enter at least X and Z coordinates", ephemeral: true });
             return
         }
