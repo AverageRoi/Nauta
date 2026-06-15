@@ -7,12 +7,12 @@ const bdd = require("../../prisma/prisma.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("registrar")
-        .setDescription("Introduce las coordenadas para registrar")
+        .setName("register")
+        .setDescription("Save your coordinates.")
         .setDMPermission(false) //hago que sólo se pueda usar en servidores
         .addStringOption((option) => 
             option
-                .setName("coordenadas")
+                .setName("coordinates")
                 .setDescription("X, Y, Z or X, Z")
                 .setRequired(true)
                 .setMaxLength(26), // Lo que he contado como las coordenadas más alejadas del World Border en caracteres
@@ -21,7 +21,7 @@ module.exports = {
         .addStringOption((option) => 
             option
                 .setName("dimension")
-                .setDescription("La dimensión de las coordenadas")
+                .setDescription("Your coordinates' dimension")
                 .setRequired(true)
                 .setChoices(
                     { name: "Overworld", value: "overworld_dimension" },
@@ -42,7 +42,7 @@ module.exports = {
                 prisma = require('../../prisma/prisma.js');
             }
         
-        const coordinates = interaction.options.getString("coordenadas");
+        const coordinates = interaction.options.getString("coordinates");
         const dimension = interaction.options.getString("dimension");
         const alias = interaction.options.getString("alias");
         const interaction_user = interaction.user.id;
