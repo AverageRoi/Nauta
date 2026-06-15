@@ -68,7 +68,7 @@ module.exports = {
         const coordinates_untrimmed = coordinates.split(",")
 
         // Para ver si no han introducido los datos necesarios
-        if (listacoords.alias.includes(alias)){
+        if (listacoords.some(coord => coord.alias === alias)){
             await interaction.reply( {content: "That alias is already in use.", ephemeral: true });
             return
         } else if (!coordinates_untrimmed[0] || !coordinates_untrimmed[1])  {
