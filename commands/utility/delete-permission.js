@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
+const prisma = require("../../prisma/prisma.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -23,6 +24,14 @@ module.exports = {
                 color: 0x7950c0,
                 reason: 'Role created to manage and delete coordinates stored in Nauta Bot.'
             });
-        }
+        };
+
+        prisma.derol.upsert({
+            where: {guild: interaction.guildId},
+            update: {DELETOR: interaction.options.getString("rol")},
+            create: {guildId: interaction.guildId, DELETOR: interaction.options.getString("rol")},
+        })
+
+        interaction.reply(`Permissions adjusted for ${interaction.options.getString("rol")} to be Nauta admins.`);
     },
 };
