@@ -25,6 +25,6 @@ model cords {
 
 model derole {
   id Int @id @default(autoincrement())
-  guildId String
+  guildId String @unique
   DELETOR String
 }
