@@ -22,6 +22,8 @@ module.exports = {
             }
         });
 
+        console.log(db)
+
         let clearance = false;
 
         const deletorRole = db?.DELETOR;
@@ -81,6 +83,8 @@ module.exports = {
                     ephemeral: true}
                 );
             }
+        } else {
+            await interaction.reply("You don't have permission to do this!")
         }
     },
 };
