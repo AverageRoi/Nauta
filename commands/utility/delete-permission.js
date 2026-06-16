@@ -18,16 +18,18 @@ module.exports = {
             )
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
     async execute(interaction) {
+        await interaction.deferReply({ ephemeral: true });
+        
         let customrole;
         if (!customrole && interaction.options.getString("rol") === "custom"){
-            const customrole = await interaction.guild.roles.create({
+            customrole = await interaction.guild.roles.create({
                 name: 'Nauta Admin',
                 color: 0x7950c0,
                 reason: 'Role created to manage and delete coordinates stored in Nauta Bot.'
             });
         };
 
-        prisma.derole.upsert({
+        await prisma.derole.upsert({
             where: {guildId: interaction.guildId},
             update: {DELETOR: interaction.options.getString("rol")},
             create: {guildId: interaction.guildId, DELETOR: interaction.options.getString("rol")},
