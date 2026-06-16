@@ -28,7 +28,7 @@ module.exports = {
         };
 
         prisma.derole.upsert({
-            where: {guild: interaction.guildId},
+            where: {guildId: interaction.guildId},
             update: {DELETOR: interaction.options.getString("rol")},
             create: {guildId: interaction.guildId, DELETOR: interaction.options.getString("rol")},
         })
