@@ -18,6 +18,7 @@ module.exports = {
             )
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
     async execute(interaction) {
+        let customrole;
         if (!customrole && interaction.options.getString("rol") === "custom"){
             const customrole = await interaction.guild.roles.create({
                 name: 'Nauta Admin',
