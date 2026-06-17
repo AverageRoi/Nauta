@@ -35,6 +35,6 @@ module.exports = {
             create: {guildId: interaction.guildId, DELETOR: interaction.options.getString("rol")},
         })
 
-        interaction.reply(`Permissions adjusted for ${interaction.options.getString("rol")} to be Nauta admins.`);
+        interaction.editReply(`Permissions adjusted for ${interaction.options.getString("rol")} to be Nauta admins.`);
     },
 };
