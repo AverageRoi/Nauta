@@ -20,7 +20,7 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply({ ephemeral: true });
         
-        let customrole = interaction.guild.roles.cache.get('Nauta Admin');
+        let customrole = interaction.guild.roles.cache.find(role => role.name === 'Nauta Admin');
         if (!customrole && interaction.options.getString("rol") === "custom"){
             customrole = await interaction.guild.roles.create({
                 name: 'Nauta Admin',
