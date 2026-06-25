@@ -3,12 +3,12 @@ const prisma = require("../../prisma/prisma.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("delete-permission")
-        .setDescription("Set permissions for deleting coordinates.")
+        .setName("register-permission")
+        .setDescription("Set permissions for registering coordinates.")
         .addStringOption((option) => 
             option
                 .setName("rol")
-                .setDescription("Rol able to delete coordinates.")
+                .setDescription("Rol able to register coordinates.")
                 .setRequired(true)
                 .addChoices(
                     { name: "Administrator roles", value: "admin" },

@@ -28,3 +28,9 @@ model derole {
   guildId String @unique
   DELETOR String
 }
+
+model regrole {
+  id Int @id @default(autoincrement())
+  guildId String @unique
+  REGISTRATOR String
+}

@@ -47,6 +47,44 @@ module.exports = {
         const alias = interaction.options.getString("alias");
         const interaction_user = interaction.user.id;
 
+        const db = await prisma.regrole.findFirst({
+            where: {
+                guildId: interaction.guildId,
+            }
+        });
+
+        console.log(db)
+
+        let clearance = false;
+
+        const registratorRole = db?.REGISTRATOR;
+
+        if ((registratorRole === "admin")){
+            if(interaction.member.permissions.has(PermissionFlagsBits.Administrator)){
+                clearance = true
+            }
+            else {
+                clearance = false
+                await interaction.reply(
+                {content: `You don't have permission to do this!`,
+                ephemeral: true,}
+                );
+                return;
+            }
+        } else if (registratorRole === "custom") {
+            const customRole = interaction.member.guild.roles.cache.find(role => role.name === "Nauta Admin");
+            if (customRole && interaction.member.roles.cache.has(customRole.id)){
+                clearance = true;
+            } else {
+                clearance = false;
+                await interaction.reply(
+                    {content: `You don't have permission to do this!`,
+                    ephemeral: true,}
+                );
+                return;
+            }
+        } else {clearance = true}
+
         const listacoords = await bdd.cords.findMany({ //Esto es solo para comprobar si existe alias. Se importa por otro lado la bdd.
             where: {
                 guildId: interaction.guildId,
@@ -95,25 +133,31 @@ module.exports = {
         console.log(interaction.options.data);
 
         // Aquí iría la conexión con el prisma.js y todas esas cosiñas ~ Se aprecia el galego ahí :3
-        try{
-            await prisma.cords.create({ //he cambiado upsert a create porque no es necesario actualizar
-                data: {
-                    guildId: interaction.guildId,
-                    interaction_user,
-                    alias,
-                    x_coordinates,
-                    y_coordinates,
-                    z_coordinates,
-                    dimension,
-                }
-            });
-            await interaction.reply({content: "Your coordinates have been recorded!", ephemeral: true });
-        } catch (error) {
-            console.error(error);
-            await interaction.reply({
-                content: "Error guardando las coordenadas.",
-                ephemeral: true,
-            });
+        if (clearance===true){
+            try{
+                await interaction.reply(
+                {content: `Registering coordinates...`,
+                ephemeral: true,}
+                );
+                await prisma.cords.create({ //he cambiado upsert a create porque no es necesario actualizar
+                    data: {
+                        guildId: interaction.guildId,
+                        interaction_user,
+                        alias,
+                        x_coordinates,
+                        y_coordinates,
+                        z_coordinates,
+                        dimension,
+                    }
+                });
+                await interaction.reply({content: "Your coordinates have been recorded!", ephemeral: true });
+            } catch (error) {
+                console.error(error);
+                await interaction.reply({
+                    content: "Error guardando las coordenadas.",
+                    ephemeral: true,
+                });
+            }
         }
     },
 };
