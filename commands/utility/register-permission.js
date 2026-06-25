@@ -29,7 +29,7 @@ module.exports = {
             });
         };
 
-        await prisma.derole.upsert({
+        await prisma.regrole.upsert({
             where: {guildId: interaction.guildId},
             update: {DELETOR: interaction.options.getString("rol")},
             create: {guildId: interaction.guildId, DELETOR: interaction.options.getString("rol")},
