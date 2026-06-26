@@ -38,6 +38,7 @@ module.exports = {
         ),
 
     async execute(interaction) {
+        await interaction.deferReply({ ephemeral: true });
         
         const coordinates = interaction.options.getString("coordinates");
         const dimension = interaction.options.getString("dimension");
@@ -62,7 +63,7 @@ module.exports = {
             }
             else {
                 clearance = false
-                await interaction.reply(
+                await interaction.editReply(
                 {content: `You don't have permission to do this!`,
                 ephemeral: true,}
                 );
@@ -74,7 +75,7 @@ module.exports = {
                 clearance = true;
             } else {
                 clearance = false;
-                await interaction.reply(
+                await interaction.editReply(
                     {content: `You don't have permission to do this!`,
                     ephemeral: true,}
                 );
@@ -104,14 +105,14 @@ module.exports = {
 
         // Para ver si no han introducido los datos necesarios
         if (listacoords.some(coord => coord.alias === alias)){
-            await interaction.reply( {content: "That alias is already in use.", ephemeral: true });
+            await interaction.editReply( {content: "That alias is already in use.", ephemeral: true });
             return
         } else if (!coordinates_untrimmed[0] || !coordinates_untrimmed[1])  {
-            await interaction.reply( {content: "Please enter at least X and Z coordinates", ephemeral: true });
+            await interaction.editReply( {content: "Please enter at least X and Z coordinates", ephemeral: true });
             return
         }
         else if (Has_not_numeric_characters) {
-            await interaction.reply( {content: "Please enter numeric values separated by commas", ephemeral: true });
+            await interaction.editReply( {content: "Please enter numeric values separated by commas", ephemeral: true });
             return
         }
         // Para ver si sólo hay x e y
@@ -132,7 +133,7 @@ module.exports = {
         // Aquí iría la conexión con el prisma.js y todas esas cosiñas ~ Se aprecia el galego ahí :3
         if (clearance===true){
             try{
-                await interaction.reply(
+                await interaction.editReply(
                 {content: `Registering coordinates...`,
                 ephemeral: true,}
                 );
@@ -147,10 +148,10 @@ module.exports = {
                         dimension,
                     }
                 });
-                await interaction.reply({content: "Your coordinates have been recorded!", ephemeral: true });
+                await interaction.editReply({content: "Your coordinates have been recorded!", ephemeral: true });
             } catch (error) {
                 console.error(error);
-                await interaction.reply({
+                await interaction.editReply({
                     content: "Error guardando las coordenadas.",
                     ephemeral: true,
                 });
