@@ -1,6 +1,6 @@
 //registrar.js
 const { SlashCommandBuilder } = require("discord.js");
-let prisma;
+const prisma = require('../../prisma/prisma.js');
 
 //Esto es solo para comprobar si existe alias. Se importa por otro lado la bdd.
 const bdd = require("../../prisma/prisma.js");
@@ -38,9 +38,6 @@ module.exports = {
         ),
 
     async execute(interaction) {
-            if (!prisma) {
-                prisma = require('../../prisma/prisma.js');
-            }
         
         const coordinates = interaction.options.getString("coordinates");
         const dimension = interaction.options.getString("dimension");
