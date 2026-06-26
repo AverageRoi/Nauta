@@ -1,5 +1,5 @@
 //registrar.js
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const prisma = require('../../prisma/prisma.js');
 
 //Esto es solo para comprobar si existe alias. Se importa por otro lado la bdd.
