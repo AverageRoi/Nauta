@@ -3,7 +3,7 @@ const prisma = require("../../prisma/prisma.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("delete")
+        .setName("nuke")
         .setDescription("Delete all info from this server coordinates (this is irreversible)."),
 
     async execute(interaction) {
