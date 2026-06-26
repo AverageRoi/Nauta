@@ -31,8 +31,8 @@ module.exports = {
 
         await prisma.regrole.upsert({
             where: {guildId: interaction.guildId},
-            update: {DELETOR: interaction.options.getString("rol")},
-            create: {guildId: interaction.guildId, DELETOR: interaction.options.getString("rol")},
+            update: {REGISTRATOR: interaction.options.getString("rol")},
+            create: {guildId: interaction.guildId, REGISTRATOR: interaction.options.getString("rol")},
         })
 
         interaction.editReply(`Permissions adjusted for ${interaction.options.getString("rol")} to be Nauta admins.`);
