@@ -24,7 +24,7 @@ module.exports = {
 
         console.log(db)
 
-        let clearance = false;
+        let clearance = true;
 
         const deletorRole = db?.DELETOR;
 
