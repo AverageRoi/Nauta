@@ -44,6 +44,15 @@ module.exports = {
             }
         });
 
+        const listacoords = await bdd.cords.findMany({ //Esto es solo para comprobar si existe alias. Se importa por otro lado la bdd.
+            where: {
+                guildId: interaction.guildId,
+            },
+            orderBy: {
+                alias: "asc",
+            }
+        });
+        
         console.log(db)
 
         let clearance = true;
