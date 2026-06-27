@@ -121,7 +121,7 @@ module.exports = {
                 ephemeral: true,}
             );
             try {
-                const result = await prisma.cords.update({
+                const result = await prisma.cords.updateMany({
                     where: {
                         guildId: interaction.guildId,
                         alias: aliasborrar,
