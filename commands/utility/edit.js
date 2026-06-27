@@ -32,6 +32,8 @@ module.exports = {
         ),
 
     async execute(interaction) {
+        interaction.deferReply();
+        
         const aliasborrar = interaction.options.getString("alias");
 
         const coordinates = interaction.options.getString("coordinates");
@@ -65,7 +67,7 @@ module.exports = {
             }
             else {
                 clearance = false
-                await interaction.reply(
+                await interaction.editReply(
                 {content: `You don't have permission to do this!`,
                 ephemeral: true,}
                 );
@@ -77,7 +79,7 @@ module.exports = {
                 clearance = true;
             } else {
             clearance = false;
-            await interaction.reply(
+            await interaction.editReply(
                 {content: `You don't have permission to do this!`,
                 ephemeral: true,}
             );
@@ -116,7 +118,7 @@ module.exports = {
         }
 
         if (clearance){
-            await interaction.reply(
+            await interaction.editReply(
                 {content: `Editing coordinates from ${aliasborrar}...`,
                 ephemeral: true,}
             );
@@ -151,7 +153,7 @@ module.exports = {
                 );
             }
         } else {
-            await interaction.reply("You don't have permission to do this!")
+            await interaction.editReply("You don't have permission to do this!")
         }
     },
 };
