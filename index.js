@@ -4,6 +4,10 @@
 // Require the necessary discord.js classes (para el cliente, comandos y todo eso)
 const { Client, Collection, Events, GatewayIntentBits, MessageFlags } = require('discord.js');
 
+// Como somos un web service (no vamos a pagar por un bg worker), necesitamos un puerto,
+// por lo que empezamos con requerir el server
+const http = require("node:http");
+
 // Se consigue el token por una environmental variable
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const DATABASE_URL = process.env.DATABASE_URL; //Same con la url de la bdd
@@ -79,3 +83,16 @@ client.on(Events.InteractionCreate, async interaction => {
 
 // Log in to Discord with your client's token
 client.login(BOT_TOKEN);
+
+// Render nos da el puerto, pero si no tenemos un fallback a 10000
+
+const PORT = process.env.PORT || 10000;
+
+// Creamos el http server y lo anunciamos en la consola
+
+http.createServer((req, res) => {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("Bot is running.");
+}).listen(PORT, "0.0.0.0", () => {
+    console.log(`Health server listening on port ${PORT}`);
+});
