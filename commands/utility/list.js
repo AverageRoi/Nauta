@@ -42,7 +42,7 @@ const DIMENSIONS = {
 // The default dimension
 const default_dimension = "overworld";
 
-// Discord can only show up to 25 fields per embed page, we'll improve this later
+// Discord can only show up to 25 fields per embed page.
 const max_visible_coordinates = 25;
 
 // Buttons will remain active for 10 min max
@@ -92,7 +92,11 @@ function truncateText(value, maximumLength) {
 
 // EMBED BUILDER TIME (YAY)
 
-function buildCoordinatesEmbed(allCoordinates, selectedDimensionKey) {
+function getCoordinatePageData(
+    allCoordinates,
+    selectedDimensionKey,
+    requestedPage = 0
+) {
 
     // Fallback to Overworld if somehow smt weird reaches this
     const dimension = 
@@ -105,10 +109,51 @@ function buildCoordinatesEmbed(allCoordinates, selectedDimensionKey) {
             coordinate.dimension === dimension.databaseValue
     );
 
-    // For now, we'll only show 25 coordinates per dimension
+    const totalPages = Math.max(
+        1,
+        Math.ceil(
+            filteredCoordinates.length / max_visible_coordinates
+        )
+    );
+
+    const currentPage = Math.min(
+        Math.max(requestedPage, 0),
+        totalPages - 1
+    );
+
+    const startIndex = currentPage * max_visible_coordinates;
+
     const visibleCoordinates = filteredCoordinates.slice(
-        0,
-        max_visible_coordinates
+        startIndex,
+        startIndex + max_visible_coordinates
+    );
+
+    return {
+        dimension,
+        filteredCoordinates,
+        visibleCoordinates,
+        currentPage,
+        totalPages,
+        startIndex,
+    };
+}
+
+function buildCoordinatesEmbed(
+    allCoordinates,
+    selectedDimensionKey,
+    requestedPage = 0
+) {
+    const {
+        dimension,
+        filteredCoordinates,
+        visibleCoordinates,
+        currentPage,
+        totalPages,
+        startIndex,
+    } = getCoordinatePageData(
+        allCoordinates,
+        selectedDimensionKey,
+        requestedPage
     );
 
     const embed = new EmbedBuilder()
@@ -130,23 +175,32 @@ function buildCoordinatesEmbed(allCoordinates, selectedDimensionKey) {
             inline: false,
         });
     } else {
-        // Convert each Prisma record into an embed field.
+        // Convert each Prisma record into an embed field
         const coordinateFields = visibleCoordinates.map(
             (coordinate, index) =>
-                buildCoordinateField(coordinate, index)
+                buildCoordinateField(
+                    coordinate,
+                    startIndex + index
+                )
         );
 
         embed.addFields(coordinateFields);
     }
 
 
-     // Explain when some records have been hidden because of the 25 field limit.
+     // Tell users where they are when this dimension spans multiple pages
 
-    if (filteredCoordinates.length > max_visible_coordinates) {
+    if (totalPages > 1) {
+        const firstVisibleCoordinate = startIndex + 1;
+        const lastVisibleCoordinate =
+            startIndex + visibleCoordinates.length;
+
         embed.setFooter({
             text:
-                `Showing ${max_visible_coordinates} of ` +
-                `${filteredCoordinates.length} coordinates`,
+                `Showing ${firstVisibleCoordinate}-` +
+                `${lastVisibleCoordinate} of ` +
+                `${filteredCoordinates.length} coordinates | ` +
+                `Page ${currentPage + 1}/${totalPages}`,
         });
     } else {
         const coordinateWord =
@@ -164,7 +218,7 @@ function buildCoordinatesEmbed(allCoordinates, selectedDimensionKey) {
    return embed;
 }
 
-// ACTION ROW BUILDER
+// ACTION ROW BUILDERRRR
 
 function buildDimensionButtons(
     selectedDimensionKey,
@@ -178,7 +232,8 @@ function buildDimensionButtons(
                 .setStyle(dimension.buttonStyle)
 
                 // We'll also disable the currently selected dimension so the user
-                // cannot repeatedly click a button that would change nothing.
+                // cannot repeatedly click a button that would change nothing and probably make think
+                // Discord we are bots or smt (get it? HAHAHAH).
                 // When disableAll is true, every button is disabled.
                 .setDisabled(
                     disableAll ||
@@ -188,6 +243,67 @@ function buildDimensionButtons(
     );
 
     return new ActionRowBuilder().addComponents(buttons);
+}
+
+function buildPaginationButtons(
+    currentPage,
+    totalPages,
+    disableAll = false
+) {
+    const previousButton = new ButtonBuilder()
+        .setCustomId("coordinates:pagination:previous")
+        .setLabel("Previous")
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(disableAll || currentPage === 0);
+
+    const nextButton = new ButtonBuilder()
+        .setCustomId("coordinates:pagination:next")
+        .setLabel("Next")
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(
+            disableAll ||
+            currentPage >= totalPages - 1
+        );
+
+    return new ActionRowBuilder().addComponents(
+        previousButton,
+        nextButton
+    );
+}
+
+function buildListComponents(
+    allCoordinates,
+    selectedDimensionKey,
+    requestedPage,
+    disableAll = false
+) {
+    const {
+        currentPage,
+        totalPages,
+    } = getCoordinatePageData(
+        allCoordinates,
+        selectedDimensionKey,
+        requestedPage
+    );
+
+    const components = [
+        buildDimensionButtons(
+            selectedDimensionKey,
+            disableAll
+        ),
+    ];
+
+    if (totalPages > 1) {
+        components.push(
+            buildPaginationButtons(
+                currentPage,
+                totalPages,
+                disableAll
+            )
+        );
+    }
+
+    return components;
 }
 
 // Now what we've all been waiting for: COMMAND EXPORT
@@ -229,16 +345,20 @@ module.exports = {
             });
 
             let selectedDimension = default_dimension;
+            let selectedPage = 0;
 
             
             // Build the initial Overworld interface.
             const initialEmbed = buildCoordinatesEmbed(
                 coordinates,
-                selectedDimension
+                selectedDimension,
+                selectedPage
             );
 
-            const initialButtonRow = buildDimensionButtons(
-                selectedDimension
+            const initialComponents = buildListComponents(
+                coordinates,
+                selectedDimension,
+                selectedPage
             );
 
             // editReply() replaces the deferred "thinking" response.
@@ -247,7 +367,7 @@ module.exports = {
 
             const responseMessage = await interaction.editReply({
                 embeds: [initialEmbed],
-                components: [initialButtonRow],
+                components: initialComponents,
             });
 
             // Create a collector for button interactions attached to
@@ -296,45 +416,80 @@ module.exports = {
 
                         // Extract the dimension key. "coordinates:nether" becomes "nether".
 
-                        const selectedKey =
-                            buttonInteraction.customId.split(":")[1];
+                        const customIdParts =
+                            buttonInteraction.customId.split(":");
 
-                        // Do not trust a custom ID without validating it
-                        if (!DIMENSIONS[selectedKey]) {
-                            await buttonInteraction.reply({
-                                content:
-                                    "That dimension is not valid",
-                                flags: MessageFlags.Ephemeral,
-                            });
+                        if (customIdParts[1] === "pagination") {
+                            const direction = customIdParts[2];
+                            const pageData = getCoordinatePageData(
+                                coordinates,
+                                selectedDimension,
+                                selectedPage
+                            );
 
-                            return;
+                            if (direction === "previous") {
+                                selectedPage = Math.max(
+                                    pageData.currentPage - 1,
+                                    0
+                                );
+                            } else if (direction === "next") {
+                                selectedPage = Math.min(
+                                    pageData.currentPage + 1,
+                                    pageData.totalPages - 1
+                                );
+                            } else {
+                                await buttonInteraction.reply({
+                                    content:
+                                        "That page action is not valid",
+                                    flags: MessageFlags.Ephemeral,
+                                });
+
+                                return;
+                            }
+                        } else {
+                            const selectedKey = customIdParts[1];
+
+                            // Do not trust a custom ID without validating it (I'm sure nothing will happen if this is gone though)
+                            if (!DIMENSIONS[selectedKey]) {
+                                await buttonInteraction.reply({
+                                    content:
+                                        "That dimension is not valid",
+                                    flags: MessageFlags.Ephemeral,
+                                });
+
+                                return;
+                            }
+
+                            // Update the interface state
+                            selectedDimension = selectedKey;
+                            selectedPage = 0;
                         }
-
-                        // Update the interface state.
-                        selectedDimension = selectedKey;
 
                         // Build a completely new embed and button row
                         // using the newly selected dimension.
                         const updatedEmbed =
                             buildCoordinatesEmbed(
                                 coordinates,
-                                selectedDimension
+                                selectedDimension,
+                                selectedPage
                             );
 
-                        const updatedButtonRow =
-                            buildDimensionButtons(
-                                selectedDimension
+                        const updatedComponents =
+                            buildListComponents(
+                                coordinates,
+                                selectedDimension,
+                                selectedPage
                             );
 
                         
                         // update() acknowledges the button interaction and edits the message containing the button.
                         
-                        // The bot therefore updates the same message
-                        // instead of sending a new message every time.
+                        // The bot, therefore, updates the same message
+                        // instead of sending a new message every time (which would be chaos)
                         
                         await buttonInteraction.update({
                             embeds: [updatedEmbed],
-                            components: [updatedButtonRow],
+                            components: updatedComponents,
                         });
                     } catch (error) {
                         console.error(
@@ -350,7 +505,7 @@ module.exports = {
                             await buttonInteraction
                                 .reply({
                                     content:
-                                        "Something else went wrong while changing dimensions, please try again",
+                                        "Something **else** went wrong while changing dimensions, please try again or contact our support server",
                                     flags: MessageFlags.Ephemeral,
                                 })
                                 .catch(console.error);
@@ -364,14 +519,16 @@ module.exports = {
             collector.on("end", async () => {
                 try {
                      // Rebuild the row with disableAll set to true. Prevents further interactions from failing.
-                    const disabledButtonRow =
-                        buildDimensionButtons(
+                    const disabledComponents =
+                        buildListComponents(
+                            coordinates,
                             selectedDimension,
+                            selectedPage,
                             true
                         );
 
                     await responseMessage.edit({
-                        components: [disabledButtonRow],
+                        components: disabledComponents,
                     });
                 } catch (error) {
 
