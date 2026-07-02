@@ -36,7 +36,7 @@ module.exports = {
         )
         .addNumberOption((option) =>
             option
-                .setName("distancia")
+                .setName("distance")
                 .setDescription("Search coordinates within a certain block range (500 by default)")
                 .setRequired(false)
                 .setMinValue(1)
@@ -48,7 +48,7 @@ module.exports = {
         const dimension = interaction.options.getString("dimension");
         const target = interaction.options.getString("target")
         const interaction_user = interaction.user.id;  //Lo mismo, copia-pega en algunas partes
-        const maxdist = interaction.options.getNumber("distancia") ?? 500;
+        const maxdist = interaction.options.getNumber("distance") ?? 500;
 
         // Declaro las variables, me acabo de enterar de que las variables declaradas dentro de ifs no persisten,
         // pero los valores asignados dentro de ifs si.

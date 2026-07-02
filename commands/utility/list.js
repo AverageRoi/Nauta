@@ -199,7 +199,7 @@ function buildCoordinatesEmbed(
             text:
                 `Showing ${firstVisibleCoordinate}-` +
                 `${lastVisibleCoordinate} of ` +
-                `${filteredCoordinates.length} coordinates | ` +
+                `${filteredCoordinates.length} coordinates • ` +
                 `Page ${currentPage + 1}/${totalPages}`,
         });
     } else {

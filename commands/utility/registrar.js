@@ -152,7 +152,7 @@ module.exports = {
             } catch (error) {
                 console.error(error);
                 await interaction.editReply({
-                    content: "Error guardando las coordenadas.",
+                    content: "Error saving coordinates.",
                     ephemeral: true,
                 });
             }

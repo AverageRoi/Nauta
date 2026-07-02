@@ -7,8 +7,8 @@ module.exports = {
         .setDescription("Set permissions for deleting coordinates.")
         .addStringOption((option) => 
             option
-                .setName("rol")
-                .setDescription("Rol able to delete coordinates.")
+                .setName("role")
+                .setDescription("Role able to delete coordinates.")
                 .setRequired(true)
                 .addChoices(
                     { name: "Administrator roles", value: "admin" },
@@ -21,7 +21,7 @@ module.exports = {
         await interaction.deferReply({ ephemeral: true });
         
         let customrole = interaction.guild.roles.cache.find(role => role.name === 'Nauta Admin');
-        if (!customrole && interaction.options.getString("rol") === "custom"){
+        if (!customrole && interaction.options.getString("role") === "custom"){
             customrole = await interaction.guild.roles.create({
                 name: 'Nauta Admin',
                 color: 0x7950c0,
@@ -31,10 +31,10 @@ module.exports = {
 
         await prisma.derole.upsert({
             where: {guildId: interaction.guildId},
-            update: {DELETOR: interaction.options.getString("rol")},
-            create: {guildId: interaction.guildId, DELETOR: interaction.options.getString("rol")},
+            update: {DELETOR: interaction.options.getString("role")},
+            create: {guildId: interaction.guildId, DELETOR: interaction.options.getString("role")},
         })
 
-        interaction.editReply(`Permissions adjusted for ${interaction.options.getString("rol")} to be Nauta admins.`);
+        interaction.editReply(`Permissions adjusted for ${interaction.options.getString("role")} to be Nauta admins.`);
     },
 };
