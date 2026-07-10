@@ -32,30 +32,18 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        interaction.deferReply();
+        await interaction.deferReply({ ephemeral: true });
         
         const aliasborrar = interaction.options.getString("alias");
 
         const coordinates = interaction.options.getString("coordinates");
         const dimension = interaction.options.getString("dimension");
-        const interaction_user = interaction.user.id;
 
         const db = await prisma.derole.findFirst({
             where: {
                 guildId: interaction.guildId,
             }
         });
-
-        const listacoords = await prisma.cords.findMany({
-            where: {
-                guildId: interaction.guildId,
-            },
-            orderBy: {
-                alias: "asc",
-            }
-        });
-
-        console.log(db)
 
         let clearance = true;
 

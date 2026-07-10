@@ -46,7 +46,6 @@ module.exports = {
         const coordinates = interaction.options.getString("coordinates");
         const dimension = interaction.options.getString("dimension");
         const target = interaction.options.getString("target")
-        const interaction_user = interaction.user.id;
         const maxdist = interaction.options.getNumber("distance") ?? 500;
 
         let x_coordinates;
@@ -98,8 +97,6 @@ module.exports = {
             return coordinate.dimension === target;
         })
 
-        console.log("Filtered:", filteredCoordinates);
-
         const nearCords = filteredCoordinates.filter((coordinate) => {
             const db_x = parseFloat(coordinate.x_coordinates);
             const db_z = parseFloat(coordinate.z_coordinates);
@@ -121,21 +118,8 @@ module.exports = {
                 (z_coordinates - z * factor) ** 2
             );
             
-            console.log(
-                coordinate.alias,
-                "=>",
-                targetdist,
-                "(max:", maxdist, ")"
-            );
-
             return targetdist <= maxdist;
         });
-
-        console.log('Final:', nearCords);
-
-        console.log("target:", target);
-        console.log("filteredTargetCoordinates:", filteredTargetCoordinates.length);
-        console.log("nearTargetCords:", nearTargetCords.length);
 
         const dimensionNames = {
             overworld_dimension: "Overworld",

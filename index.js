@@ -4,7 +4,6 @@ const { Client, Collection, Events, GatewayIntentBits, MessageFlags } = require(
 const http = require("node:http");
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
-const DATABASE_URL = process.env.DATABASE_URL;
 
 const fs = require("node:fs");
 const path = require("node:path");
@@ -35,7 +34,7 @@ for (const folder of commandsFolders) {
         if ("data" in command && "execute" in command) {
             client.commands.set(command.data.name, command);
         } else {
-            console.log("[WARNING] The command at ${filePath} is missing a required 'data' or 'execute' property.");
+            console.log(`[WARNING] The command at ${filePath} is missing a required 'data' or 'execute' property.`);
         }
     }
 }
@@ -47,22 +46,26 @@ client.on(Events.InteractionCreate, async interaction => {
     const command = interaction.client.commands.get(interaction.commandName);
 
     if (!command){
-        console.error("No command has been found to have the name ${interaction.commandName}.")
+        console.error(`No command has been found to have the name ${interaction.commandName}.`)
         return;
     }
 
     try {
         await command.execute(interaction);
     } catch (error) {
-        console.error(error);
-        if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({
-                content: "There was an error while trying to execute this command :(",
-                flags: MessageFlags.Ephemeral,
-            });
-        }
+    console.error(error);
+
+    const errorMessage = {
+        content: "There was an error while trying to execute this command :(",
+        flags: MessageFlags.Ephemeral,
+    };
+
+    if (interaction.replied || interaction.deferred) {
+        await interaction.followUp(errorMessage);
+    } else {
+        await interaction.reply(errorMessage);
     }
-});
+    }
 
 client.login(BOT_TOKEN);
 
@@ -73,4 +76,4 @@ http.createServer((req, res) => {
     res.end("Bot is running.");
 }).listen(PORT, "0.0.0.0", () => {
     console.log(`Health server listening on port ${PORT}`);
-});
+}); });

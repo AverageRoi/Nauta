@@ -1,8 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const prisma = require('../../prisma/prisma.js');
 
-const bdd = require("../../prisma/prisma.js");
-
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("register")
@@ -40,15 +38,13 @@ module.exports = {
         const coordinates = interaction.options.getString("coordinates");
         const dimension = interaction.options.getString("dimension");
         const alias = interaction.options.getString("alias");
-        const interaction_user = interaction.user.id;
+        const interactionUserId = interaction.user.id;
 
         const db = await prisma.regrole.findFirst({
             where: {
                 guildId: interaction.guildId,
             }
         });
-
-        console.log(db)
 
         let clearance = true;
 
@@ -80,7 +76,7 @@ module.exports = {
             }
         } else {clearance = true}
 
-        const listacoords = await bdd.cords.findMany({
+        const listacoords = await prisma.cords.findMany({
             where: {
                 guildId: interaction.guildId,
             },
@@ -119,8 +115,6 @@ module.exports = {
             z_coordinates = coordinates_untrimmed[2].trim()
         }
 
-        console.log(interaction.options.data);
-
         if (clearance===true){
             try{
                 await interaction.editReply(
@@ -130,7 +124,7 @@ module.exports = {
                 await prisma.cords.create({
                     data: {
                         guildId: interaction.guildId,
-                        interaction_user,
+                        interaction_user: interactionUserId,
                         alias,
                         x_coordinates,
                         y_coordinates,

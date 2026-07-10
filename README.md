@@ -163,7 +163,7 @@ Nauta is definitely one of the projects where I learned by building first and th
 
 Nauta was co-developed by **Rodrigo Vélez (`AverageRoi`)** and **Pipo (`B-M198`)**.
 
-We both contributed to the bot during its development, and the repository's commit history reflects that collaboration. Though we both contributed to the same logic, Pipo mostly focused on backend (DB and calculations) while I focused on frontend (output and Discord API).
+We both worked across the bot, but Pipo focused more on database logic and calculations, while I focused more on Discord interactions and user-facing output.
 
 Nauta also has a separate website repository for its public pages and documentation.
 
