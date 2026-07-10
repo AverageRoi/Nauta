@@ -1,19 +1,18 @@
 const { SlashCommandBuilder, EmbedBuilder} = require("discord.js")
-const prisma = require("../../prisma/prisma.js") //Bah ya sabes esto no lo comento jsjsj
+const prisma = require("../../prisma/prisma.js")
 
 module.exports = {
-    data: new SlashCommandBuilder() //Todo el slash command está hecho rápido para que funcione, igual no está bien en plan front
+    data: new SlashCommandBuilder()
         .setName("near-me")
         .setDescription("Search the nearest saved coordinates relative to your position")
-        .setDMPermission(false) //hago que sólo se pueda usar en servidores
+        .setDMPermission(false)
         .addStringOption((option) => 
             option
                 .setName("coordinates")
                 .setDescription("Your current location in X, Y, Z or X, Z")
                 .setRequired(true)
-                .setMaxLength(26), // Lo que he contado como las coordenadas más alejadas del World Border en caracteres
-            ) //Ehhh sí, los comentarios por aquí son tuyos porque hay un poco de copia-pega
-            // Creo que Str es lo mejor aunque sea un int, ya que es fácil liarnos y podemos dividirlo y hacer typecasting después
+                .setMaxLength(26),
+            )
         .addStringOption((option) => 
             option
                 .setName("dimension")
@@ -47,21 +46,17 @@ module.exports = {
         const coordinates = interaction.options.getString("coordinates");
         const dimension = interaction.options.getString("dimension");
         const target = interaction.options.getString("target")
-        const interaction_user = interaction.user.id;  //Lo mismo, copia-pega en algunas partes
+        const interaction_user = interaction.user.id;
         const maxdist = interaction.options.getNumber("distance") ?? 500;
-
-        // Declaro las variables, me acabo de enterar de que las variables declaradas dentro de ifs no persisten,
-        // pero los valores asignados dentro de ifs si.
 
         let x_coordinates;
         let y_coordinates;
         let z_coordinates;
 
-        // True if the coordinate has weird values we don't accept 
+        // Reject values that are not numbers, commas, minus signs, or spaces.
         const Has_not_numeric_characters = /[^0-9,\-\s]/.test(coordinates);
         const coordinates_untrimmed = coordinates.split(",")
 
-        // Para ver si no han introducido los datos necesarios
         if (!coordinates_untrimmed[0] || !coordinates_untrimmed[1])  {
             await interaction.reply( {content: "Please enter at least X and Z coordinates", ephemeral: true });
             return
@@ -70,10 +65,8 @@ module.exports = {
             await interaction.reply( {content: "Please enter numeric values separated by commas", ephemeral: true });
             return
         }
-        // Para ver si sólo hay x e y
         else if (!coordinates_untrimmed[2]) {
             x_coordinates = coordinates_untrimmed[0].trim()
-            // Sólo por si acaso
             y_coordinates = null
             z_coordinates = coordinates_untrimmed[1].trim()
         }
@@ -83,23 +76,20 @@ module.exports = {
             z_coordinates = coordinates_untrimmed[2].trim()
         }
 
-        x_coordinates = parseFloat(x_coordinates); //Trabajo con las coordenadas en float porque me es más fácil, luego habría que volver a pasarlas a string pero bueno
+        x_coordinates = parseFloat(x_coordinates);
         y_coordinates = parseFloat(y_coordinates);
         z_coordinates = parseFloat(z_coordinates);
 
-        //Importar base de datos del servidor
         const dbcords = await prisma.cords.findMany({
             where: {
                 guildId: interaction.guildId,
             },
 
-            // Order alphabetically
             orderBy: {
                 alias: "asc",
             },
         });
 
-        //filtrar por dimensión
         const filteredCoordinates = dbcords.filter((coordinate) => {
             return coordinate.dimension === dimension;
         });
@@ -116,7 +106,6 @@ module.exports = {
 
             const dist = Math.sqrt((x_coordinates - db_x) ** 2 + (z_coordinates - db_z) ** 2);
 
-            // Lo que hago es sacar de los valores con dimensión nether, multiplico la coordenada de la base de datos por ocho, para que esté en formato overworld. No tengo claro si tiene sentido.
             return dist <= maxdist;
         });
         
@@ -124,6 +113,7 @@ module.exports = {
             const x = parseFloat(coordinate.x_coordinates);
             const z = parseFloat(coordinate.z_coordinates);
 
+            // Convert target coordinates into the current dimension scale before measuring distance.
             const factor = target === "nether_dimension" ? 8 : 1 / 8;
 
             const targetdist = Math.sqrt(
@@ -141,7 +131,7 @@ module.exports = {
             return targetdist <= maxdist;
         });
 
-        console.log('Final:', nearCords); //Sí, falta que discord haga algo con esta info, pero tengo que comer jshdjsjh 
+        console.log('Final:', nearCords);
 
         console.log("target:", target);
         console.log("filteredTargetCoordinates:", filteredTargetCoordinates.length);
@@ -211,5 +201,3 @@ module.exports = {
         });
     }
 }
-
-//Cómo se me puede dar tan mal comentar código? Lo siento. :sad:

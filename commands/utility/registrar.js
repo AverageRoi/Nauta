@@ -1,23 +1,20 @@
-//registrar.js
 const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 const prisma = require('../../prisma/prisma.js');
 
-//Esto es solo para comprobar si existe alias. Se importa por otro lado la bdd.
 const bdd = require("../../prisma/prisma.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("register")
         .setDescription("Save your coordinates.")
-        .setDMPermission(false) //hago que sólo se pueda usar en servidores
+        .setDMPermission(false)
         .addStringOption((option) => 
             option
                 .setName("coordinates")
                 .setDescription("X, Y, Z or X, Z")
                 .setRequired(true)
-                .setMaxLength(26), // Lo que he contado como las coordenadas más alejadas del World Border en caracteres
+                .setMaxLength(26),
             )
-            // Creo que Str es lo mejor aunque sea un int, ya que es fácil liarnos y podemos dividirlo y hacer typecasting después
         .addStringOption((option) => 
             option
                 .setName("dimension")
@@ -83,7 +80,7 @@ module.exports = {
             }
         } else {clearance = true}
 
-        const listacoords = await bdd.cords.findMany({ //Esto es solo para comprobar si existe alias. Se importa por otro lado la bdd.
+        const listacoords = await bdd.cords.findMany({
             where: {
                 guildId: interaction.guildId,
             },
@@ -92,18 +89,14 @@ module.exports = {
             }
         });
 
-        // Declaro las variables, me acabo de enterar de que las variables declaradas dentro de ifs no persisten,
-        // pero los valores asignados dentro de ifs si.
-
         let x_coordinates;
         let y_coordinates;
         let z_coordinates;
 
-        // True if the coordinate has weird values we don't accept
+        // Reject values that are not numbers, commas, minus signs, or spaces.
         const Has_not_numeric_characters = /[^0-9,\-\s]/.test(coordinates);
         const coordinates_untrimmed = coordinates.split(",")
 
-        // Para ver si no han introducido los datos necesarios
         if (listacoords.some(coord => coord.alias === alias)){
             await interaction.editReply( {content: "That alias is already in use.", ephemeral: true });
             return
@@ -115,10 +108,8 @@ module.exports = {
             await interaction.editReply( {content: "Please enter numeric values separated by commas", ephemeral: true });
             return
         }
-        // Para ver si sólo hay x e y
         else if (!coordinates_untrimmed[2]) {
             x_coordinates = coordinates_untrimmed[0].trim()
-            // Sólo por si acaso
             y_coordinates = null
             z_coordinates = coordinates_untrimmed[1].trim()
         }
@@ -130,14 +121,13 @@ module.exports = {
 
         console.log(interaction.options.data);
 
-        // Aquí iría la conexión con el prisma.js y todas esas cosiñas ~ Se aprecia el galego ahí :3
         if (clearance===true){
             try{
                 await interaction.editReply(
                 {content: `Registering coordinates...`,
                 ephemeral: true,}
                 );
-                await prisma.cords.create({ //he cambiado upsert a create porque no es necesario actualizar
+                await prisma.cords.create({
                     data: {
                         guildId: interaction.guildId,
                         interaction_user,
