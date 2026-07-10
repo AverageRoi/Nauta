@@ -1,9 +1,13 @@
 {
-  "name": "cords_package",
+  "name": "nauta",
   "version": "1.0.0",
-  "description": "Starting!",
-  "license": "ISC",
-  "author": "",
+  "description": "Discord bot for saving, finding, and managing Minecraft locations.",
+  "private": true,
+  "license": "UNLICENSED",
+  "contributors": [
+    "Rodrigo Vélez",
+    "B-M198"
+  ],
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
@@ -15,7 +19,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "^6.19.3",
     "@prisma/client": "^6.19.3",
-    "discord.js": "^14.26.4",
+    "discord.js": "^13.17.1",
     "dotenv": "^17.4.2",
     "pg": "^8.21.0"
   },
