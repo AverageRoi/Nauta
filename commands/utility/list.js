@@ -39,14 +39,17 @@ const DIMENSIONS = {
     },
 };
 
+// The default dimension
 const default_dimension = "overworld";
 
 // Discord can only show up to 25 fields per embed page.
 const max_visible_coordinates = 25;
 
+// Buttons will remain active for 10 min max
 // Button collectors expire after 10 minutes.
 const collector_time = 10 * 60 * 1000;
 
+// Parsing:
 function truncateText(value, maximumLength) {
     const text = String(value ?? "");
 
@@ -54,27 +57,34 @@ function truncateText(value, maximumLength) {
         return text;
     }
 
+    // One character available for ellipsis (just in case)
     return `${text.slice(0, maximumLength - 1)}…`;
 }
 
     function buildCoordinateField(coordinate, index) {
+    // If alias in null, undefined, or weird stuff happens, we change it to the next one
     // Fall back to a generated name if the alias is empty.
         const alias =
         coordinate.alias?.trim() ||
         `Coordinate ${index + 1}`;
 
+    // If x or z coordinates are missing, we indicate it (should NOT happen normally)
     const x = String(coordinate.x_coordinates ?? "?");
     const z = String(coordinate.z_coordinates ?? "?");
 
+    // We define fieldValue so inside the if we have space to hold the value in
     let fieldValue;
 
+    // If we have y coordinates
     if (coordinate.y_coordinates !== null) {
         const y = String(coordinate.y_coordinates);
         fieldValue = `\`${x}, ${y}, ${z}\``;
     } else {
+    // If we don't have y coordinates
         fieldValue = `\`${x}, ?, ${z}\``;
     }
 
+    // We also make it be within Discord embed limits
     return {
         name: truncateText(alias, 256),
         value: truncateText(fieldValue, 1024),
@@ -82,17 +92,21 @@ function truncateText(value, maximumLength) {
     };
 }
 
+// EMBED BUILDER TIME (YAY)
+
 function getCoordinatePageData(
     allCoordinates,
     selectedDimensionKey,
     requestedPage = 0
 ) {
 
+    // Fallback to Overworld if somehow smt weird reaches this
     // Fall back to Overworld if an invalid dimension key reaches this helper.
     const dimension = 
         DIMENSIONS[selectedDimensionKey] ??
         DIMENSIONS[default_dimension];
 
+    // Filter the arrays Prisma returns, so dbb and Discord values can relate to each other
     // Match Prisma records to the selected Discord dimension.
     const filteredCoordinates = allCoordinates.filter(
         (coordinate) =>
@@ -155,6 +169,7 @@ function buildCoordinatesEmbed(
         .setTimestamp()
         .setThumbnail(dimension.thumbnail);
 
+    // Now, we have to deal with empty states
     if (visibleCoordinates.length === 0) {
         embed.addFields({
             name: "No coordinates found",
@@ -164,6 +179,7 @@ function buildCoordinatesEmbed(
             inline: false,
         });
     } else {
+        // Convert each Prisma record into an embed field
         const coordinateFields = visibleCoordinates.map(
             (coordinate, index) =>
                 buildCoordinateField(
@@ -175,6 +191,8 @@ function buildCoordinatesEmbed(
         embed.addFields(coordinateFields);
     }
 
+
+     // Tell users where they are when this dimension spans multiple pages
 
     if (totalPages > 1) {
         const firstVisibleCoordinate = startIndex + 1;
@@ -204,6 +222,8 @@ function buildCoordinatesEmbed(
    return embed;
 }
 
+// ACTION ROW BUILDERRRR
+
 function buildDimensionButtons(
     selectedDimensionKey,
     disableAll = false
@@ -215,6 +235,10 @@ function buildDimensionButtons(
                 .setLabel(dimension.label)
                 .setStyle(dimension.buttonStyle)
 
+                // We'll also disable the currently selected dimension so the user
+                // cannot repeatedly click a button that would change nothing and probably make think
+                // Discord we are bots or smt (get it? HAHAHAH).
+                // When disableAll is true, every button is disabled.
                 // Disable the selected dimension and, when requested, every button.
                 .setDisabled(
                     disableAll ||
@@ -287,12 +311,15 @@ function buildListComponents(
     return components;
 }
 
+// Now what we've all been waiting for: COMMAND EXPORT
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("list")
         .setDescription("Open the server coordinate list"),
 
     async execute(interaction) {
+        // We disable it in DMs
         // Coordinates are server-specific, so this command requires a guild.
         if (!interaction.inGuild()) {
             await interaction.reply({
@@ -304,6 +331,9 @@ module.exports = {
             return;
         }
 
+        // We need to acknowledge the slash command immediately.
+        // So that the database operation has time to finish without
+        // Discord displaying "The application did not respond."
         // Acknowledge the command before loading data from the database.
         
         await interaction.deferReply();
@@ -314,6 +344,7 @@ module.exports = {
                     guildId: interaction.guildId,
                 },
 
+                // Order alphabetically
                 orderBy: {
                     alias: "asc",
                 },
@@ -323,6 +354,7 @@ module.exports = {
             let selectedPage = 0;
 
             
+            // Build the initial Overworld interface.
             const initialEmbed = buildCoordinatesEmbed(
                 coordinates,
                 selectedDimension,
@@ -335,10 +367,17 @@ module.exports = {
                 selectedPage
             );
 
+            // editReply() replaces the deferred "thinking" response.
+            // It also returns the Message object, which lets us attach
+            // a component collector directly to this specific message.
+
             const responseMessage = await interaction.editReply({
                 embeds: [initialEmbed],
                 components: initialComponents,
             });
+
+            // Create a collector for button interactions attached to
+            // this particular response message.
 
             const collector =
                 responseMessage.createMessageComponentCollector({
@@ -346,11 +385,12 @@ module.exports = {
                     time: collector_time,
                 });
 
+            // Runs every time one of the buttons is clicked.
             collector.on(
                 "collect",
                 async (buttonInteraction) => {
                     try {
-                        // Only the user who ran /list can control this message.
+                        // Only the user who ran /list can control this message
                         if (
                             buttonInteraction.user.id !==
                             interaction.user.id
@@ -364,6 +404,7 @@ module.exports = {
                             return;
                         }
 
+                        // Verify that this button belongs to this feature.
                         // Ignore buttons that are not part of the coordinate browser.
                         if (
                             !buttonInteraction.customId.startsWith(
@@ -379,6 +420,8 @@ module.exports = {
 
                             return;
                         }
+
+                        // Extract the dimension key. "coordinates:nether" becomes "nether".
 
                         const customIdParts =
                             buttonInteraction.customId.split(":");
@@ -413,7 +456,7 @@ module.exports = {
                         } else {
                             const selectedKey = customIdParts[1];
 
-                            // Validate custom IDs before using them as dimension keys.
+                            // Do not trust a custom ID without validating it (I'm sure nothing will happen if this is gone though)
                             if (!DIMENSIONS[selectedKey]) {
                                 await buttonInteraction.reply({
                                     content:
@@ -424,10 +467,13 @@ module.exports = {
                                 return;
                             }
 
+                            // Update the interface state
                             selectedDimension = selectedKey;
                             selectedPage = 0;
                         }
 
+                        // Build a completely new embed and button row
+                        // using the newly selected dimension.
                         const updatedEmbed =
                             buildCoordinatesEmbed(
                                 coordinates,
@@ -441,8 +487,11 @@ module.exports = {
                                 selectedDimension,
                                 selectedPage
                             );
+                        // update() acknowledges the button interaction and edits the message containing the button.
 
-                        
+                        // The bot, therefore, updates the same message
+                        // instead of sending a new message every time (which would be chaos)
+
                         await buttonInteraction.update({
                             embeds: [updatedEmbed],
                             components: updatedComponents,
@@ -453,6 +502,7 @@ module.exports = {
                             error
                         );
 
+                        // If the button has not already been acknowledged, we send the user a private error response.
                         if (
                             !buttonInteraction.replied &&
                             !buttonInteraction.deferred
@@ -470,8 +520,10 @@ module.exports = {
             );
 
         
+            // Runs after the collector reaches its time limit.
             collector.on("end", async () => {
                 try {
+                    // Rebuild the row with disableAll set to true. Prevents further interactions from failing.
                     const disabledComponents =
                         buildListComponents(
                             coordinates,
@@ -485,7 +537,7 @@ module.exports = {
                     });
                 } catch (error) {
 
-                    // The message or channel may no longer exist when the collector ends.
+                    // Editing can fail if the message or channel was deleted before collector ended.
                     console.error(
                         "Could not disable coordinate buttons",
                         error
@@ -498,6 +550,8 @@ module.exports = {
                 error
             );
 
+            // Because deferReply() already acknowledged the interaction,
+            // editReply() must be used instead of reply().
             if (interaction.deferred || interaction.replied) {
                 await interaction
                     .editReply({
@@ -509,6 +563,8 @@ module.exports = {
                     .catch(console.error);
             } else {
                 
+                // This branch is just in case. Under normal circumstances,
+                // deferReply() already happened before the Prisma query.
                 await interaction
                     .reply({
                         content:
