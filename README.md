@@ -1,117 +1,132 @@
 # Nauta
 
-**Shared spatial lookup for Minecraft communities. Save, search, and find locations across dimensions directly from Discord.**
+**Nauta — navigate your Minecraft world.**
 
-Nauta turns a Discord server's scattered Minecraft coordinates into a persistent, searchable location system.
+A live Discord bot for Minecraft communities to save important locations, find them again later, and see what useful places are nearby.
 
-Instead of bases, farms, portals, shops, and other locations disappearing into old messages, screenshots, or personal notes, Nauta stores them as shared server data and makes them available through Discord commands.
+Instead of coordinates disappearing into old messages, screenshots, spreadsheets, or someone's private notes, Nauta keeps them in one shared collection for the server.
 
-Its most distinctive feature is proximity search: Nauta can find saved locations near a player's current position and account for coordinate differences between Minecraft dimensions.
+**[Add Nauta to your server](https://discord.com/oauth2/authorize?client_id=1515786853356277820&permissions=274877958144&integration_type=0&scope=bot)** · **[Visit the website](https://nautabot.netlify.app/)**
 
-> **Status:** Live · actively deployed  
-> **Runtime:** Render  
-> **Interface:** Discord slash commands  
-> **Stack:** JavaScript · discord.js · Prisma · PostgreSQL  
-> **Focus:** Shared spatial data · proximity search · cross-dimensional coordinates
-
-[Website](https://nautabot.netlify.app/) · [Add Nauta](https://discord.com/oauth2/authorize?client_id=1515786853356277820&permissions=274877958144&integration_type=0&scope=bot)
-
----
-
-## The problem
-
-Minecraft coordinates are easy to save and surprisingly easy to lose.
-
-A base gets posted in one channel. A farm is buried in an old message. Someone sends a Nether portal location privately. Another player keeps important coordinates in a screenshot.
-
-Eventually, the server has plenty of location information but no single place to retrieve it.
-
-Nauta treats locations as **shared server data** instead.
-
-A coordinate can be saved once and then found later by anyone with access to that server's collection.
+| | |
+| --- | --- |
+| **Status** | Live · actively deployed |
+| **Hosting** | Render |
+| **Interface** | Discord slash commands |
+| **Stack** | JavaScript · discord.js · Prisma · PostgreSQL |
+| **Built for** | Shared Minecraft locations · nearby search · dimension-aware coordinates |
 
 ---
 
-# What Nauta does
+## Why we built it
 
-Nauta provides a persistent location layer for Minecraft servers using Discord as the interface.
+Minecraft coordinates are really easy to lose.
 
-### Location storage
+A base gets posted in one channel. Someone sends a farm location a week later. A Nether portal ends up in a screenshot. Eventually the server has plenty of useful coordinates, but nobody knows where to find them.
 
-Saved locations can contain:
+Pipo and I wanted something simpler:
 
-- a name or alias;
-- X / Y / Z coordinates;
+> **Save a useful place once, then let the server find it again whenever someone needs it.**
+
+That became Nauta.
+
+What started as a basic coordinate-saving bot gradually grew into a shared location system with persistent storage, aliases, permissions, nearby searches, and support for different Minecraft dimensions.
+
+---
+
+## What Nauta does
+
+### Save locations for the whole server
+
+Nauta keeps a shared collection of Minecraft locations rather than tying coordinates to one person's notes.
+
+A saved location can include its:
+
+- name or alias;
+- coordinates;
 - Minecraft dimension;
-- and associated location information.
+- and other information associated with the location.
 
-Locations belong to the Discord server's shared collection rather than to a single user's notes.
+Once saved, the location remains available to the server through Discord.
 
-### Search and retrieval
+### Find places again
 
-Users can retrieve saved locations by name or alias without searching through old messages.
+Players can retrieve locations by their saved name or alias instead of scrolling through old conversations.
 
-### Nearby-location search
+This works well for things such as:
 
-Given a player's current coordinates, Nauta can search the server's saved locations and return those within a selected distance.
+- bases;
+- farms;
+- portals;
+- shops;
+- community builds;
+- resource areas;
+- meeting points;
+- and other places worth remembering.
 
-### Cross-dimensional lookup
+### Find what is nearby
 
-Nauta understands that Minecraft dimensions do not always share the same coordinate scale.
+Nauta can also start with the player's current position instead of a location name.
 
-When a search crosses between the **Overworld and Nether**, Nauta converts the relevant coordinates before calculating proximity.
+Using `/near-me`, a player can give Nauta their coordinates and ask which saved locations are within a selected distance.
 
-### Multi-dimensional storage
+### Work with different dimensions
 
-Locations can be stored for:
+Locations can be stored in the:
 
-- Overworld;
-- Nether;
-- End.
+- **Overworld**
+- **Nether**
+- **End**
 
-### Controlled editing
+Nauta keeps the dimension with each location so identical-looking coordinates in different dimensions are not treated as the same place.
 
-Saved locations can be edited or deleted through permission-aware commands rather than allowing every user to alter shared data.
+For searches between the Overworld and Nether, it also accounts for the difference in coordinate scale before comparing distances.
+
+### Keep shared data under control
+
+Because these locations belong to the server rather than one person, Nauta also includes permission-aware editing and deletion.
+
+That lets communities maintain a shared collection without making every saved location freely editable by everyone.
 
 ---
 
 # `/near-me`
 
-The feature that best represents Nauta is `/near-me`.
+`/near-me` is probably the feature that best represents how Nauta grew beyond the original idea.
 
-At first, the problem sounds simple:
+At first, it sounds simple:
 
-> Given the player's position, find saved locations nearby.
+> Give the bot your coordinates and return saved places within a certain distance.
 
-For a single dimension, that mostly means calculating distance.
+For locations in the same dimension, that is mostly a distance calculation.
 
-Across dimensions, it becomes a spatial-conversion problem.
+Then dimensions get involved.
 
-A Nether location cannot be compared directly against an Overworld position because the two dimensions use different coordinate scales.
+A Nether location cannot be compared directly with an Overworld position because Minecraft uses a different coordinate scale between the two.
 
-Nauta therefore separates the search into two paths:
+Nauta handles that before calculating the distance.
 
 ```text
 Player coordinates
-        │
-        ▼
+       │
+       ▼
 Parse X,Z or X,Y,Z
-        │
-        ▼
-Load saved server locations
-        │
-        ├──────── Same dimension
-        │               │
-        │               ▼
-        │        Calculate distance
-        │
-        └──────── Target dimension
-                        │
-                        ▼
-                Convert coordinate scale
-                        │
-                        ▼
-                 Calculate distance
-        │
-        ▼
-Return locations inside the requested range
+       │
+       ▼
+Load the server's saved locations
+       │
+       ├──────── Same dimension
+       │              │
+       │              ▼
+       │       Compare distance
+       │
+       └──────── Target dimension
+                      │
+                      ▼
+              Convert coordinates
+                      │
+                      ▼
+               Compare distance
+       │
+       ▼
+Return locations inside the selected range
