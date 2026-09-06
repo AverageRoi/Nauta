@@ -1,6 +1,6 @@
 # Nauta
 
-**Nauta — navigate your Minecraft world.**
+**Nauta, navigate your Minecraft world.**
 
 A live Discord bot for Minecraft communities to save important locations, find them again later, and see what useful places are nearby.
 
