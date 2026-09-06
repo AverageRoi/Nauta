@@ -196,5 +196,3 @@ Nauta is an independent project and is not affiliated with or endorsed by Discor
 ## Current status
 
 **Live and actively maintained.**
-
-**[Add Nauta to your server](https://discord.com/oauth2/authorize?client_id=1515786853356277820&integration_type=0&permissions=274877958144&scope=bot)** · **[Visit Nauta](https://nautabot.netlify.app/)**
