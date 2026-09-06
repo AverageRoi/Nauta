@@ -168,7 +168,7 @@ The project grew around making the original idea more useful rather than around 
 
 Nauta was co-developed by:
 
-- **Rodrigo Vélez (`AverageRoi`)**
+- **AverageRoi (`AverageRoi`)**
 - **Pipo (`B-M198`)**
 
 We both worked across the project. Pipo focused more heavily on **database logic and calculations**, while I focused more heavily on **Discord interactions and user-facing behaviour**.
