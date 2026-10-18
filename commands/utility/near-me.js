@@ -68,10 +68,17 @@ module.exports = {
             await interaction.reply( {content: "Please enter at least X and Z coordinates", ephemeral: true });
             return
         }
-        else if (Has_not_numeric_characters) {
-            await interaction.reply( {content: "Please enter numeric values separated by commas", ephemeral: true });
-            return
-        }
+        else if (
+            Has_not_numeric_characters ||
+            ![2, 3].includes(coordinates_untrimmed.length) ||
+            coordinates_untrimmed.some(part => !/^-?\d+$/.test(part.trim()))
+            ) {
+                await interaction.reply({
+                    content: "Use X, Z or X, Y, Z with whole numbers separated by commas.",
+                    ephemeral: true
+                    });
+            return;
+}
         // Para ver si sólo hay x e y
         else if (!coordinates_untrimmed[2]) {
             x_coordinates = coordinates_untrimmed[0].trim()
